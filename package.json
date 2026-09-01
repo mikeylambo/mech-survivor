@@ -5,7 +5,7 @@
   "type": "module",
   "scripts": {
     "dev": "node dev-server.mjs",
-    "build": "node --check public/creatures.js && node --check public/anatomy-v3.js && node --check public/morphotypes-v4.js && node --check public/lineage-v4.js && node --check public/species-v5.js && node --check public/apex-v5.js && node --check public/ecology-v4.js && node --check public/anatomy-lab-v3.js && node --check public/celestial-frame.js && node --check public/game.js && node --check public/meta.js && node --check dev-server.mjs && node --test game.test.mjs anatomy.test.mjs morphotypes.test.mjs lineage.test.mjs species.test.mjs apex.test.mjs ecology.test.mjs"
+    "build": "node --check public/creatures.js && node --check public/anatomy-v3.js && node --check public/morphotypes-v4.js && node --check public/lineage-v4.js && node --check public/species-v5.js && node --check public/motion-v5.js && node --check public/apex-v5.js && node --check public/ecology-v4.js && node --check public/encounters-v5.js && node --check public/anatomy-lab-v3.js && node --check public/celestial-frame.js && node --check public/game.js && node --check public/meta.js && node --check dev-server.mjs && node --test game.test.mjs anatomy.test.mjs morphotypes.test.mjs lineage.test.mjs species.test.mjs motion.test.mjs apex.test.mjs ecology.test.mjs encounters.test.mjs"
   },
   "engines": {
     "node": ">=20"
