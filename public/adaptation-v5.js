@@ -9,10 +9,21 @@ export const BIOMES={
  4:{id:'crown',hueShift:12,accentShift:150,traits:['apex','radiance'],mutations:['arcaneNode','crystalGrowth','shell']}
 };
 function pushUnique(a,v){if(v&&!a.includes(v))a.push(v)}
+function applyMutationEffects(g,added){
+ const s=g.stats||(g.stats={});
+ if(added.includes('shell')){s.armor=Math.min(.6,(s.armor||0)+.1);s.hp=(s.hp||1)*1.06}
+ if(added.includes('arcaneNode')){s.pulse=true;s.burst=Math.max(1.15,s.burst||1)}
+ if(added.includes('crystalGrowth'))s.projectiles=(s.projectiles||0)+1;
+ if(added.includes('rupture')){s.damage=(s.damage||1)*1.18;s.hp=(s.hp||1)*.88}
+ if(added.includes('splitJaw'))s.contact=(s.contact||1)*1.16;
+ if(added.includes('extraLimbs'))s.speed=(s.speed||1)*1.1;
+ return g;
+}
 export function adaptGenome(base,world,{seed=`${base.seed}:adapt:${world}`,severity=1}={}){
- const r=rng(seed),b=BIOMES[world]||BIOMES[0],g=structuredClone(base);g.adaptation={world,biome:b.id,severity,traits:[]};
+ const r=rng(seed),b=BIOMES[world]||BIOMES[0],g=structuredClone(base),added=[];g.adaptation={world,biome:b.id,severity,traits:[]};
  g.presentation={...g.presentation,hue:(g.presentation.hue+b.hueShift+360)%360,accent:(g.presentation.accent+b.accentShift+360)%360};
- const count=Math.max(1,Math.min(3,Math.round(severity+(world>2?1:0))));for(let i=0;i<count;i++){const m=pick(r,b.mutations);pushUnique(g.mutations,m);pushUnique(g.adaptation.traits,pick(r,b.traits))}
+ const count=Math.max(1,Math.min(3,Math.round(severity+(world>2?1:0))));for(let i=0;i<count;i++){const m=pick(r,b.mutations),had=g.mutations.includes(m);pushUnique(g.mutations,m);if(!had)added.push(m);pushUnique(g.adaptation.traits,pick(r,b.traits))}
+ applyMutationEffects(g,added);g.adaptation.addedMutations=added;
  if(b.id==='open'){g.stats.speed=(g.stats.speed||1)*(1+.035*severity);if(g.motion)g.motion.stride*=1+.04*severity}
  if(b.id==='veil'){if(g.motion)g.motion.sway*=1+.12*severity;g.stats.speed=(g.stats.speed||1)*(1+.025*severity)}
  if(b.id==='forge'){g.stats.armor=Math.min(.55,(g.stats.armor||0)+.05*severity);g.stats.hp=(g.stats.hp||1)*(1+.05*severity)}
@@ -21,4 +32,4 @@ export function adaptGenome(base,world,{seed=`${base.seed}:adapt:${world}`,sever
  return g;
 }
 export function adaptLine(line,world,{seed='adapt-line',severity=1}={}){return line.map((g,i)=>adaptGenome(g,world,{seed:`${seed}:${i}`,severity:severity+i*.25}))}
-export function adaptationSummary(g){return`${g.adaptation?.biome?.toUpperCase()||'BASE'} // ${(g.adaptation?.traits||[]).join(' · ')||'unaltered'}`}
+export function adaptationSummary(g){return`${g.adaptation?.biome?.toUpperCase()||'BASE'} // ${(g.adaptation?.traits||[]).join(' · ')||'unaltered'} // ${(g.adaptation?.addedMutations||[]).join(', ')||'no new mutation'}`}
