@@ -5,6 +5,7 @@
 // Species V5 adds hereditary signature silhouettes and markings.
 // Motion V5 adds inherited gait, cadence and stage exaggeration.
 // Curation V5 automatically rejects visually noisy candidates.
+// Branching V6 adds alternate final-form specializations.
 // Apex V5 adds boss-only mutation and phase grammar.
 // Adaptation V5 applies regional palette/material/mutation pressure.
 // Ecology V4 builds small coherent run bestiaries from those species.
@@ -12,6 +13,7 @@
 // Gameplay-linked genes retained: shell')?.22 attack:'projectile' attack:'spawn' attack:'shield' projectiles: spawner: shield: contact: speed: hp: damage: pulse: crystalGrowth
 import {generateCreatureGenome as rawGenerateCreatureGenome,mutateCreatureGenome,drawArcaneCreature,creatureName,genomeSummary,creatureParts,generateEvolutionLine,evolveCreatureGenome,breedCreatureGenomes,lineageRoles,speciesMotifs,applyMotion,GAITS} from './motion-v5.js';
 import {generateCuratedGenome,generateCuratedLine,scoreGenome,scoreLine,isCurated,curationSummary} from './curation-v5.js';
+import {generateEvolutionTree,branchCreatureGenome,evolutionTreeSummary,BRANCH_ROLES} from './branching-v6.js';
 import {createApexGenome,apexPhase,APEX_MUTATIONS} from './apex-v5.js';
 import {adaptGenome,adaptLine,adaptationSummary,BIOMES} from './adaptation-v5.js';
 import {generateRunEcology,genomeFromEcology,evolveEcologyFamily,ecologySummary,ECOLOGY_SLOTS} from './ecology-v4.js';
@@ -29,7 +31,7 @@ export function generateCreatureGenome(seed,options={}){
  const variation=.95+(tinyHash(seed)%11)/100;g.presentation.scale*=variation;g.individual={seed:String(seed),variation,wave};g.difficulty=options.difficulty||g.difficulty||1;return g;
 }
 export function resetRuntimeEcologies(){runtimeEcologies.clear()}
-export {rawGenerateCreatureGenome,mutateCreatureGenome,drawArcaneCreature,creatureName,genomeSummary,creatureParts,generateEvolutionLine,evolveCreatureGenome,breedCreatureGenomes,lineageRoles,speciesMotifs,applyMotion,GAITS,generateCuratedGenome,generateCuratedLine,scoreGenome,scoreLine,isCurated,curationSummary,createApexGenome,apexPhase,APEX_MUTATIONS,adaptGenome,adaptLine,adaptationSummary,BIOMES,generateRunEcology,genomeFromEcology,evolveEcologyFamily,ecologySummary,ECOLOGY_SLOTS,makeEncounterPlan,encounterSummary,ENCOUNTER_PATTERNS,drawCelestialFrame};
+export {rawGenerateCreatureGenome,mutateCreatureGenome,drawArcaneCreature,creatureName,genomeSummary,creatureParts,generateEvolutionLine,evolveCreatureGenome,breedCreatureGenomes,lineageRoles,speciesMotifs,applyMotion,GAITS,generateCuratedGenome,generateCuratedLine,scoreGenome,scoreLine,isCurated,curationSummary,generateEvolutionTree,branchCreatureGenome,evolutionTreeSummary,BRANCH_ROLES,createApexGenome,apexPhase,APEX_MUTATIONS,adaptGenome,adaptLine,adaptationSummary,BIOMES,generateRunEcology,genomeFromEcology,evolveEcologyFamily,ecologySummary,ECOLOGY_SLOTS,makeEncounterPlan,encounterSummary,ENCOUNTER_PATTERNS,drawCelestialFrame};
 export function initCreatureLab(){return bootCreatureLab()}
 function autoBoot(){try{bootCreatureLab();window.__creatureLabReady=true}catch(err){window.__creatureLabReady=false;window.__creatureLabError=String(err);console.error('Creature Lab auto-init failed',err)}}
 if(document.readyState==='loading')addEventListener('DOMContentLoaded',autoBoot,{once:true});else queueMicrotask(autoBoot);
