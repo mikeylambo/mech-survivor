@@ -1,4 +1,4 @@
-import {generateCreatureGenome,mutateCreatureGenome,drawArcaneCreature,creatureName,generateEvolutionLine,breedCreatureGenomes,lineageRoles} from './lineage-v4.js';
+import {generateCreatureGenome,mutateCreatureGenome,drawArcaneCreature,creatureName,generateEvolutionLine,breedCreatureGenomes,lineageRoles} from './species-v5.js';
 import {generateRunEcology,ecologySummary} from './ecology-v4.js';
 export function initCreatureLab(){
  const open=document.querySelector('#creature-lab-open'),screen=document.querySelector('#creature-lab'),grid=document.querySelector('#creature-grid'),seedInput=document.querySelector('#creature-seed'),detail=document.querySelector('#creature-detail'),worldSelect=document.querySelector('#creature-world');
