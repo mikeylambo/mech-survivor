@@ -1,4 +1,4 @@
-import {generateEvolutionLine,evolveCreatureGenome,lineageRoles} from './lineage-v4.js';
+import {generateEvolutionLine,evolveCreatureGenome,lineageRoles} from './species-v5.js';
 
 function hashSeed(input){let h=2166136261>>>0;for(const ch of String(input)){h^=ch.charCodeAt(0);h=Math.imul(h,16777619)}return h>>>0}
 function rng(seed){let a=hashSeed(seed)||1;return()=>{a+=0x6D2B79F5;let t=a;t=Math.imul(t^t>>>15,t|1);t^=t+Math.imul(t^t>>>7,t|61);return((t^t>>>14)>>>0)/4294967296}}
@@ -10,15 +10,12 @@ export function generateRunEcology(seed,{world=0,size=5}={}){
  const r=rng(`${seed}:ecology:${world}`),slots=ECOLOGY_SLOTS.slice(0,Math.max(3,Math.min(size,6))),families=[];
  for(let i=0;i<slots.length;i++){
   const slot=slots[i],morphotype=pick(r,MORPH_BY_SLOT[slot]),role=pick(r,ROLE_BY_SLOT[slot]),rootSeed=`${seed}:${world}:${slot}:${Math.floor(r()*1e7)}`,line=generateEvolutionLine(rootSeed,{world,morphotype,role,rank:slot==='heavy'?'brute':slot==='fast'||slot==='ranged'?'dart':'swarm'});
-  families.push({id:`${slot}-${hashSeed(rootSeed).toString(36)}`,slot,morphotype,role,rootSeed,line,weight:slot==='common'?4:slot==='fast'?2.5:slot==='heavy'?1.35:slot==='ranged'?1.7:slot==='support'?1.1:.55});
+  families.push({id:`${slot}-${hashSeed(rootSeed).toString(36)}`,slot,morphotype,role,rootSeed,line,weight:slot==='common'?4:slot==='fast'?2.5:slot==='heavy'?1.35:slot==='ranged'?1.7:slot==='support'?1.1:.55,signature:line[0].signature});
  }
  return{seed:String(seed),world,families};
 }
 function weightedPick(r,families,rank){let pool=families;if(rank==='brute')pool=families.filter(f=>f.slot==='heavy'||f.slot==='rare');else if(rank==='dart')pool=families.filter(f=>f.slot==='fast'||f.slot==='ranged'||f.slot==='support');else if(rank==='elite'||rank==='boss')pool=families.filter(f=>f.slot==='rare'||f.slot==='heavy');if(!pool.length)pool=families;const total=pool.reduce((s,f)=>s+f.weight,0),n=r()*total;let acc=0;for(const f of pool){acc+=f.weight;if(n<=acc)return f}return pool.at(-1)}
 export function ecologyStage(elapsed,rank='swarm',world=0){if(rank==='boss')return 3;if(rank==='elite')return elapsed>120?3:2;const pressure=elapsed+world*22;if(pressure>=180)return 3;if(pressure>=70)return 2;return 1}
-export function genomeFromEcology(ecology,{spawnSeed='spawn',elapsed=0,rank='swarm'}={}){
- const r=rng(`${ecology.seed}:${spawnSeed}:${rank}:${Math.floor(elapsed/8)}`),family=weightedPick(r,ecology.families,rank),stage=ecologyStage(elapsed,rank,ecology.world),genome=structuredClone(family.line[stage-1]||family.line[0]);
- genome.seed=`${family.rootSeed}:spawn:${spawnSeed}`;genome.rank=rank;genome.ecology={familyId:family.id,slot:family.slot,stage,rootSeed:family.rootSeed};genome.lineage={...genome.lineage,stage,role:family.role,rootSeed:family.rootSeed};return genome;
-}
+export function genomeFromEcology(ecology,{spawnSeed='spawn',elapsed=0,rank='swarm'}={}){const r=rng(`${ecology.seed}:${spawnSeed}:${rank}:${Math.floor(elapsed/8)}`),family=weightedPick(r,ecology.families,rank),stage=ecologyStage(elapsed,rank,ecology.world),genome=structuredClone(family.line[stage-1]||family.line[0]);genome.seed=`${family.rootSeed}:spawn:${spawnSeed}`;genome.rank=rank;genome.ecology={familyId:family.id,slot:family.slot,stage,rootSeed:family.rootSeed};genome.lineage={...genome.lineage,stage,role:family.role,rootSeed:family.rootSeed};return genome}
 export function evolveEcologyFamily(ecology,familyId,stage=2){const family=ecology.families.find(f=>f.id===familyId);if(!family)return null;return evolveCreatureGenome(family.line[0],stage,{role:family.role,seed:`${family.rootSeed}:ecology:${stage}`})}
-export function ecologySummary(ecology){return ecology.families.map(f=>`${f.slot.toUpperCase()}: ${f.morphotype} / ${f.role} / ${f.id}`).join('\n')}
+export function ecologySummary(ecology){return ecology.families.map(f=>`${f.slot.toUpperCase()}: ${f.morphotype} / ${f.role} / ${f.signature?.motif||'no motif'} / ${f.id}`).join('\n')}
