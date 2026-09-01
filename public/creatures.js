@@ -19,13 +19,14 @@ import {makeEncounterPlan,encounterSummary,ENCOUNTER_PATTERNS} from './encounter
 import {drawCelestialFrame} from './celestial-frame.js';
 import {initCreatureLab as bootCreatureLab} from './anatomy-lab-v3.js';
 const runtimeEcologies=new Map();
+function tinyHash(input){let h=2166136261>>>0;for(const ch of String(input)){h^=ch.charCodeAt(0);h=Math.imul(h,16777619)}return h>>>0}
 function elapsedFromGameplaySeed(seed){const p=String(seed).split('-'),n=Number(p[1]);return Number.isFinite(n)?n/10:0}
 function sectorEcology(world=0){if(!runtimeEcologies.has(world))runtimeEcologies.set(world,generateRunEcology(`sector-${world}`,{world,size:6}));return runtimeEcologies.get(world)}
 export function generateCreatureGenome(seed,options={}){
  const explicit=options.direct||options.morphotype!==undefined||options.family!==undefined||options.parent!==undefined||options.role!==undefined;
  if(explicit)return rawGenerateCreatureGenome(seed,options);
- const world=options.world||0,rank=options.rank||'swarm',elapsed=elapsedFromGameplaySeed(seed),g=genomeFromEcology(sectorEcology(world),{spawnSeed:String(seed),elapsed,rank});
- g.difficulty=options.difficulty||g.difficulty||1;return g;
+ const world=options.world||0,rank=options.rank||'swarm',elapsed=elapsedFromGameplaySeed(seed),wave=Math.floor(elapsed/6),waveSeed=`${world}:${rank}:wave:${wave}`,g=genomeFromEcology(sectorEcology(world),{spawnSeed:waveSeed,elapsed,rank});
+ const variation=.95+(tinyHash(seed)%11)/100;g.presentation.scale*=variation;g.individual={seed:String(seed),variation,wave};g.difficulty=options.difficulty||g.difficulty||1;return g;
 }
 export function resetRuntimeEcologies(){runtimeEcologies.clear()}
 export {rawGenerateCreatureGenome,mutateCreatureGenome,drawArcaneCreature,creatureName,genomeSummary,creatureParts,generateEvolutionLine,evolveCreatureGenome,breedCreatureGenomes,lineageRoles,speciesMotifs,applyMotion,GAITS,generateCuratedGenome,generateCuratedLine,scoreGenome,scoreLine,isCurated,curationSummary,createApexGenome,apexPhase,APEX_MUTATIONS,adaptGenome,adaptLine,adaptationSummary,BIOMES,generateRunEcology,genomeFromEcology,evolveEcologyFamily,ecologySummary,ECOLOGY_SLOTS,makeEncounterPlan,encounterSummary,ENCOUNTER_PATTERNS,drawCelestialFrame};
