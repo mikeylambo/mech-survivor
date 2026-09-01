@@ -1,0 +1,65 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width,initial-scale=1,maximum-scale=1,user-scalable=no">
+  <title>MECH SURVIVOR // FRAME ZERO</title>
+  <link rel="stylesheet" href="style.css">
+</head>
+<body>
+  <canvas id="game" aria-label="Mech Survivor game arena"></canvas>
+  <div id="scanlines"></div>
+  <header id="hud" class="hidden">
+    <div class="brand">FRAME <b>ZERO</b><small>MECH SURVIVOR</small></div>
+    <div class="run-stats"><span id="timer">00:00</span><span id="objective">BOSS 04:00</span><span>LV <b id="level">1</b></span><span><b id="kills">0</b> KILLS</span><span>◈ <b id="run-coins">0</b></span><button id="pause">Ⅱ</button></div>
+    <div class="systems"><label>INTEGRITY</label><div class="bar hp"><i id="hpbar"></i></div><label>SYNC</label><div class="bar xp"><i id="xpbar"></i></div><label>DASH</label><div class="dash-system"><div class="bar dash"><i id="dashbar"></i></div><b id="dash-label">READY</b></div></div>
+  </header>
+  <aside id="build" class="hidden"><h3>ASSEMBLY</h3><div id="module-list"></div></aside>
+  <section id="title" class="screen">
+    <div class="kicker">SLU RAPID PROTOTYPE // 01</div>
+    <h1>MECH<br><em>SURVIVOR</em></h1>
+    <p>THE RUN BUILDS THE MECH.</p>
+    <div class="menu-stack"><button id="start">PLAY</button><button id="shop-open">SHOP <b class="wallet">◈ 0</b></button><button id="class-open">CLASS <b id="class-label">ROOK</b></button><button id="awards-open">AWARDS</button><button id="creature-lab-open">CREATURE LAB</button><button id="settings-open">SETTINGS</button></div>
+    <div class="controls">MOVE <b>WASD / ARROWS / LEFT STICK</b> · DASH <b>SPACE / SHIFT / B / RB</b> · AUTO-FIRE</div>
+  </section>
+  <section id="worlds" class="screen hidden panel-screen">
+    <div class="kicker">EACH SECTOR IS A SEPARATE SORTIE</div><h2>SELECT SECTOR</h2>
+    <div id="world-list" class="world-list"></div><button class="back-menu">‹ BACK</button>
+  </section>
+  <section id="shop" class="screen hidden panel-screen">
+    <div class="kicker">PERMANENT FRAME POWER</div><h2>HANGAR SHOP</h2><div class="currency">◈ <b id="shop-coins">0</b> SALVAGE</div>
+    <div id="shop-grid" class="shop-grid"></div><button class="back-menu">‹ BACK</button>
+  </section>
+  <section id="awards" class="screen hidden panel-screen">
+    <div class="kicker">COMBAT RECORD</div><h2>AWARDS</h2><div id="award-grid" class="shop-grid"></div><button class="back-menu">‹ BACK</button>
+  </section>
+  <section id="class-screen" class="screen hidden panel-screen">
+    <div class="kicker">SELECT BASE CHASSIS</div><h2>FRAME CLASS</h2><div id="class-grid" class="class-grid"></div><button class="back-menu">‹ BACK</button>
+  </section>
+
+  <section id="creature-lab" class="screen hidden panel-screen creature-lab">
+    <div class="kicker">ARCANE MORPHOLOGY // GENERATOR</div><h2>CREATURE LAB</h2>
+    <div class="lab-toolbar"><input id="creature-seed" value="CHOIR-001" aria-label="Creature seed"><select id="creature-world"><option value="0">TIER 1</option><option value="1">TIER 2</option><option value="2">TIER 3</option><option value="3">TIER 4</option><option value="4">TIER 5</option></select><button id="creature-regenerate">GENERATE 12</button><button id="creature-mutant">MUTATE SELECTED</button></div>
+    <div class="lab-layout"><div id="creature-grid" class="creature-grid"></div><aside class="genome-inspector"><canvas id="creature-focus" width="300" height="210"></canvas><h3>GENOME</h3><pre id="creature-detail">Select a specimen.</pre></aside></div>
+    <button class="back-menu">‹ BACK</button>
+  </section>
+  <section id="settings" class="screen hidden panel-screen">
+    <div class="kicker">SYSTEM CONFIGURATION</div><h2>SETTINGS</h2><div class="settings-list"><button id="toggle-vfx">SCREEN SHAKE <b>ON</b></button><button id="toggle-grid">ARENA GRID <b>ON</b></button><button id="reset-save">RESET SAVE DATA</button></div><button class="back-context">‹ BACK</button>
+  </section>
+  <section id="pause-screen" class="screen hidden panel-screen"><div class="kicker">SORTIE SUSPENDED</div><h2>PAUSED</h2><div class="menu-stack"><button id="resume">RESUME</button><button id="pause-settings">SETTINGS</button><button id="restart">RESTART</button><button id="forfeit">FORFEIT & SAVE</button><button id="quit-menu">MAIN MENU</button></div></section>
+  <section id="levelup" class="screen hidden">
+    <div class="kicker">COMBAT DATA ACQUIRED</div><h2>FRAME EVOLUTION</h2><p>Choose one assembly mutation</p>
+    <div id="choices"></div><button id="reroll" class="hidden">REROLL <b id="reroll-count">0</b></button>
+  </section>
+  <section id="results" class="screen hidden">
+    <div class="kicker">FRAME RECOVERY FAILED</div><h2>RUN COMPLETE</h2>
+    <div id="result-grid"></div><div id="final-build"></div>
+    <div class="menu-row"><button id="retry">REDEPLOY</button><button id="result-menu">MAIN MENU</button><button id="result-shop">SHOP</button></div>
+  </section>
+  <section id="clear" class="screen hidden"><div class="kicker">SECTOR COMMANDER DESTROYED</div><h2>SECTOR CLEAR</h2><div id="clear-grid"></div><p id="unlock-text"></p><div class="menu-row"><button id="next-sector">NEXT SECTOR</button><button id="clear-menu">MAIN MENU</button><button id="clear-shop">SHOP</button></div></section>
+  <div id="boss-alert" class="hidden">WARNING // HEAVY SIGNATURE</div>
+  <div id="touch-controls" aria-hidden="true"><div id="touch-stick"><i></i></div><button id="touch-dash">DASH</button></div>
+  <div id="toast"></div>
+  <script type="module" src="game.js"></script><script type="module" src="meta.js"></script>
+</body>
+</html>

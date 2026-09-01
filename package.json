@@ -1,0 +1,13 @@
+{
+  "name": "mech-survivor",
+  "version": "0.1.0",
+  "private": true,
+  "type": "module",
+  "scripts": {
+    "dev": "node dev-server.mjs",
+    "build": "node --check public/creatures.js && node --check public/game.js && node --check public/meta.js && node --check dev-server.mjs && node --test game.test.mjs"
+  },
+  "engines": {
+    "node": ">=20"
+  }
+}
