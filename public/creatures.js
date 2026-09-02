@@ -37,5 +37,10 @@ export function generateCreatureGenome(seed,options={}){
 export function resetRuntimeEcologies(){runtimeEcologies.clear()}
 export {rawGenerateCreatureGenome,mutateCreatureGenome,drawArcaneCreature,creatureName,genomeSummary,creatureParts,generateEvolutionLine,evolveCreatureGenome,breedCreatureGenomes,lineageRoles,speciesMotifs,applyMotion,GAITS,generateCuratedGenome,generateCuratedLine,scoreGenome,scoreLine,isCurated,curationSummary,generateEvolutionTree,branchCreatureGenome,evolutionTreeSummary,BRANCH_ROLES,deriveCombatKit,combatKitSummary,CREATURE_MOVES,applySpeciesAppearance,appearanceSummary,PALETTES,MARKINGS,createApexGenome,apexPhase,APEX_MUTATIONS,adaptGenome,adaptLine,adaptationSummary,BIOMES,generateRunEcology,genomeFromEcology,evolveEcologyFamily,ecologySummary,ECOLOGY_SLOTS,makeEncounterPlan,encounterSummary,ENCOUNTER_PATTERNS,drawCelestialFrame};
 export function initCreatureLab(){return bootCreatureLab()}
-function autoBoot(){try{bootCreatureLab();window.__creatureLabReady=true}catch(err){window.__creatureLabReady=false;window.__creatureLabError=String(err);console.error('Creature Lab auto-init failed',err)}}
-if(document.readyState==='loading')addEventListener('DOMContentLoaded',autoBoot,{once:true});else queueMicrotask(autoBoot);
+function autoBoot(){
+ if(typeof document==='undefined'||typeof window==='undefined')return;
+ try{bootCreatureLab();window.__creatureLabReady=true}catch(err){window.__creatureLabReady=false;window.__creatureLabError=String(err);console.error('Creature Lab auto-init failed',err)}
+}
+if(typeof document!=='undefined'){
+ if(document.readyState==='loading')addEventListener('DOMContentLoaded',autoBoot,{once:true});else queueMicrotask(autoBoot);
+}
