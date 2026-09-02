@@ -18,4 +18,4 @@ export function createApexGenome(base,{seed=`${base.seed}:apex`,mutation='auto'}
  if(apex==='void-carapace'){pushUnique(g.mutations,'shell');g.signature.secondary='core-ring';g.apex.phaseGenes=['armor','reflect','exposed-core'];g.stats.armor=Math.min(.6,(g.stats.armor||0)+.18);g.stats.hp*=1.15}
  return g;
 }
-export function apexPhase(genome,hpRatio){const phase=hpRatio>.66?0:hpRatio>.33?1:2;return{phase:phase+1,gene:genome.apex?.phaseGenes?.[phase]||'pressure',mutation:genome.apex?.mutation||'unknown'}
+export function apexPhase(genome,hpRatio){const phase=hpRatio>.66?0:hpRatio>.33?1:2;return{phase:phase+1,gene:genome.apex?.phaseGenes?.[phase]||'pressure',mutation:genome.apex?.mutation||'unknown'}}
