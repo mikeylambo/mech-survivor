@@ -56,12 +56,10 @@ replace("for(const s of shots){s.life-=dt;if(s.kind==='mine'&&player.synergies.h
 `for(const s of shots){s.life-=dt;if(s.kind==='mine'){s.armed=Math.max(0,(s.armed??.35)-dt);s.pulse=(s.pulse||0)+dt;if(player.synergies.has('gravitywell'))for(const e of enemies){const dd=Math.sqrt(dist2(s,e));if(dd<145&&dd>1){e.x+=(s.x-e.x)/dd*82*dt;e.y+=(s.y-e.y)/dd*82*dt}}if(s.armed<=0){const trigger=82+player.modules.mine*6;let triggered=s.life<.25;for(const e of enemies)if(!e.dead&&dist2(s,e)<trigger*trigger){triggered=true;break}if(triggered){const radius=105+player.modules.mine*8;for(const e of enemies)if(!e.dead&&dist2(s,e)<radius*radius)damageEnemy(e,s.damage);burst(s.x,s.y,palette.cyan,24);shake=Math.max(shake,5);s.dead=true}}continue}if(s.kind==='missile'&&s.target&&!s.target.dead){`,'mine proximity logic');
 
 s=s.replace(/shots=shots\.filter\(s=>!s\.dead&&s\.life>0&&s\.x>-100&&s\.x<W\+100&&s\.y>-100&&s\.y<H\+100\);enemyShots=enemyShots\.filter\(s=>!s\.dead&&s\.life>0&&s\.x>-120&&s\.x<W\+120&&s\.y>-120&&s\.y<H\+120\);/,
-"shots=shots.filter(s=>!s.dead&&s.life>0&&Math.abs(s.x-player.x)<W*.85+250&&Math.abs(s.y-player.y)<H*.85+250);enemyShots=enemyShots.filter(s=>!s.dead&&s.life>0&&Math.abs(s.x-player.x)<W*.85+250&&Math.abs(s.y-player.y)<H*.85+250);if(shots.length>360)shots.splice(0,shots.length-360);if(enemyShots.length>220)enemyShots.splice(0,enemyShots.length-220);for(const l of lightningFx)l.life-=dt;lightningFx=lightningFx.filter(l=>l.life>0);");
+"shots=shots.filter(s=>!s.dead&&s.life>0&&Math.abs(s.x-player.x)<W*.85+250&&Math.abs(s.y-player.y)<H*.85+250);enemyShots=enemyShots.filter(s=>!s.dead&&s.life>0&&Math.abs(s.x-player.x)<W*.85+250&&Math.abs(s.y-player.y)<H*.85+250);if(shots.length>360)shots.splice(0,shots.length-360);if(enemyShots.length>220)enemyShots.splice(0,enemyShots.length-220);for(const l of lightningFx)l.life-=dt;lightningFx=lightningFx.filter(l=>l.life>0);if(particles.length>430)particles.splice(0,particles.length-430);if(gems.length>320)gems.splice(0,gems.length-320);");
 if(!s.includes("Math.abs(s.x-player.x)<W*.85+250"))throw new Error('prepare-build: projectile world cull failed');
 
 replace('function burst(x,y,color,n=8){for(let i=0;i<n;i++){','function burst(x,y,color,n=8){if(particles.length>400)n=Math.min(n,2);for(let i=0;i<n;i++){','particle cap');
-replace('if(particles.length>650)particles.splice(0,particles.length-650);if(gems.length>450)gems.splice(0,gems.length-450);',
-'if(particles.length>430)particles.splice(0,particles.length-430);if(gems.length>320)gems.splice(0,gems.length-320);','late-run transient caps');
 
 fs.writeFileSync(path,s);
 console.log('prepare-build: scrolling world + LOD + functional combat FX applied');
