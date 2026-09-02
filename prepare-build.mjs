@@ -6,9 +6,9 @@ const replace=(from,to,label)=>{if(!s.includes(from)){if(s.includes(to))return;t
 
 replace('function resize(){DPR=Math.min(devicePixelRatio||1,2);','function resize(){DPR=Math.min(devicePixelRatio||1,1.2);','DPR cap');
 replace('let player,enemies=[],shots=[],enemyShots=[],gems=[],particles=[],drones=[],caches=[],keys=new Set(),stick={x:0,y:0},choicePool=[],padDashLatch=false,touchId=null;',
-'let player,enemies=[],shots=[],enemyShots=[],gems=[],particles=[],drones=[],caches=[],lightningFx=[],keys=new Set(),stick={x:0,y:0},choicePool=[],padDashLatch=false,touchId=null;','lightning FX state');
+'let player,enemies=[],shots=[],enemyShots=[],gems=[],particles=[],drones=[],caches=[],lightningFx=[],enemyGrid=new Map(),keys=new Set(),stick={x:0,y:0},choicePool=[],padDashLatch=false,touchId=null;','runtime perf state');
 replace('player={x:W/2,y:H/2,r:18,','player={x:0,y:0,r:18,','world-space player origin');
-replace('caches=[];shake=flash=0;const maxHp=', 'caches=[];lightningFx=[];shake=flash=0;const maxHp=', 'reset transient FX');
+replace('caches=[];shake=flash=0;const maxHp=', 'caches=[];lightningFx=[];enemyGrid.clear();shake=flash=0;const maxHp=', 'reset transient FX');
 replace('player.x=clamp(player.x+move.x*player.speed*dashMult*dt,28,W-28);player.y=clamp(player.y+move.y*player.speed*dashMult*dt,65,H-28);','player.x+=move.x*player.speed*dashMult*dt;player.y+=move.y*player.speed*dashMult*dt;','unbounded movement');
 replace('room=Math.max(0,260-enemies.length)','room=Math.max(0,105-enemies.length)','enemy cap');
 replace('enemies.length<245','enemies.length<100','brood cap');
@@ -17,6 +17,18 @@ replace('const interval=Math.max(.08,.62-elapsed*.0045-activeWorld*.035);','cons
 s=s.replace(/function spawnEnemy\(boss=false,forcedType=null\)\{const side=Math\.floor\(Math\.random\(\)\*4\),pad=70;let x,y;if\(side===0\)\{x=rand\(-pad,W\+pad\);y=-pad\}else if\(side===1\)\{x=W\+pad;y=rand\(-pad,H\+pad\)\}else if\(side===2\)\{x=rand\(-pad,W\+pad\);y=H\+pad\}else\{x=-pad;y=rand\(-pad,H\+pad\)\}/,
 `function spawnEnemy(boss=false,forcedType=null){const side=Math.floor(Math.random()*4),pad=90,cx=player?.x||0,cy=player?.y||0,hw=W*.58,hh=H*.58;let x,y;if(side===0){x=cx+rand(-hw,hw);y=cy-hh-pad}else if(side===1){x=cx+hw+pad;y=cy+rand(-hh,hh)}else if(side===2){x=cx+rand(-hw,hw);y=cy+hh+pad}else{x=cx-hw-pad;y=cy+rand(-hh,hh)}`);
 if(!s.includes('cx=player?.x||0'))throw new Error('prepare-build: spawn camera patch failed');
+
+replace('function nearest(from=player){let best=null,bd=Infinity;for(const e of enemies){const d=dist2(from,e);if(d<bd){bd=d;best=e}}return best}',
+`const GRID_CELL=180;
+function gridKey(cx,cy){return cx+','+cy}
+function rebuildEnemyGrid(){enemyGrid.clear();for(const e of enemies){if(e.dead)continue;const cx=Math.floor(e.x/GRID_CELL),cy=Math.floor(e.y/GRID_CELL),key=gridKey(cx,cy);let cell=enemyGrid.get(key);if(!cell)enemyGrid.set(key,cell=[]);cell.push(e)}}
+function nearbyEnemies(x,y,r){const out=[],minX=Math.floor((x-r)/GRID_CELL),maxX=Math.floor((x+r)/GRID_CELL),minY=Math.floor((y-r)/GRID_CELL),maxY=Math.floor((y+r)/GRID_CELL);for(let cy=minY;cy<=maxY;cy++)for(let cx=minX;cx<=maxX;cx++){const cell=enemyGrid.get(gridKey(cx,cy));if(cell)for(const e of cell)if(!e.dead)out.push(e)}return out}
+function nearest(from=player){let best=null,bd=Infinity;for(const radius of [280,560,1000]){for(const e of nearbyEnemies(from.x,from.y,radius)){const d=dist2(from,e);if(d<bd){bd=d;best=e}}if(best)return best}return null}`,'spatial hash');
+
+replace("for(let i=0;i<Math.min(count,room);i++)spawnEnemy()}","for(let i=0;i<Math.min(count,room);i++)spawnEnemy()}rebuildEnemyGrid();",'grid rebuild after spawns');
+replace("if(player.dashTime>0&&player.synergies.has('fortressdrive'))for(const e of enemies)","if(player.dashTime>0&&player.synergies.has('fortressdrive'))for(const e of nearbyEnemies(player.x,player.y,90))",'dash spatial query');
+replace("for(const e of enemies)if(dist2(e,player)<radius*radius&&damageEnemy(e,18+player.modules.pulse*9+(player.synergies.has('aegisnova')?player.modules.orbit*5:0)))e.dead=true;",
+"for(const e of nearbyEnemies(player.x,player.y,radius))if(dist2(e,player)<radius*radius&&damageEnemy(e,18+player.modules.pulse*9+(player.synergies.has('aegisnova')?player.modules.orbit*5:0)))e.dead=true;",'pulse spatial query');
 
 replace("const grad=ctx.createRadialGradient(player.x,player.y,0,player.x,player.y,420);","const grad=ctx.createRadialGradient(W/2,H/2,0,W/2,H/2,420);",'arena light camera center');
 replace('function drawMech(){drawCelestialFrame(ctx,player,elapsed,input(),palette,drones)}',`function drawMech(){drawCelestialFrame(ctx,player,elapsed,input(),palette,drones)}
@@ -47,13 +59,20 @@ replace("ctx.globalAlpha=1;if(flash){ctx.fillStyle=\`rgba(70,180,255,\${flash*.0
 "ctx.globalAlpha=1;ctx.restore();if(flash){ctx.fillStyle=\`rgba(70,180,255,\${flash*.08})\`;ctx.fillRect(0,0,W,H)}ctx.restore()}",'camera transform end');
 
 replace("player._arc=(player._arc||.5)-dt;if(player.modules.arc&&player._arc<=0){player._arc=Math.max(.5,1.7-player.modules.arc*.16);const targets=[...enemies].sort((a,b)=>dist2(a,player)-dist2(b,player)).slice(0,1+player.modules.arc+(player.modules.arc>=5?2:0));for(const e of targets){burst(e.x,e.y,palette.cyan,5);if(damageEnemy(e,13+player.modules.arc*7))e.dead=true}}",
-`player._arc=(player._arc||.5)-dt;if(player.modules.arc&&player._arc<=0){player._arc=Math.max(.5,1.7-player.modules.arc*.16);const pool=enemies.filter(e=>!e.dead),count=1+player.modules.arc+(player.modules.arc>=5?2:0),range=255+player.modules.arc*18;let from=player;for(let i=0;i<count&&pool.length;i++){let best=-1,bd=range*range;for(let j=0;j<pool.length;j++){const d=dist2(pool[j],from);if(d<bd){bd=d;best=j}}if(best<0)break;const e=pool.splice(best,1)[0];lightningFx.push({ax:from.x,ay:from.y,bx:e.x,by:e.y,life:.16,max:.16});burst(e.x,e.y,palette.cyan,4);if(damageEnemy(e,13+player.modules.arc*7))e.dead=true;from=e}shake=Math.max(shake,2)}`,'judgment arc chain');
+`player._arc=(player._arc||.5)-dt;if(player.modules.arc&&player._arc<=0){player._arc=Math.max(.5,1.7-player.modules.arc*.16);const count=1+player.modules.arc+(player.modules.arc>=5?2:0),range=255+player.modules.arc*18,pool=nearbyEnemies(player.x,player.y,range*(count>3?2.1:1.65));let from=player;for(let i=0;i<count&&pool.length;i++){let best=-1,bd=range*range;for(let j=0;j<pool.length;j++){const d=dist2(pool[j],from);if(d<bd){bd=d;best=j}}if(best<0)break;const e=pool.splice(best,1)[0];lightningFx.push({ax:from.x,ay:from.y,bx:e.x,by:e.y,life:.16,max:.16});burst(e.x,e.y,palette.cyan,4);if(damageEnemy(e,13+player.modules.arc*7))e.dead=true;from=e}shake=Math.max(shake,2)}`,'judgment arc chain');
 
 replace("for(let i=0;i<n;i++)shots.push({x:player.x+(i?18:-8),y:player.y+(i?-8:8),vx:0,vy:0,r:9,life:6,damage:28+player.modules.mine*12,kind:'mine',pierce:0})",
 "for(let i=0;i<n;i++)shots.push({x:player.x+(i?18:-8),y:player.y+(i?-8:8),vx:0,vy:0,r:9,life:6,damage:28+player.modules.mine*12,kind:'mine',pierce:0,armed:.35,pulse:0})",'mine armed state');
 
 replace("for(const s of shots){s.life-=dt;if(s.kind==='mine'&&player.synergies.has('gravitywell'))for(const e of enemies){const dd=Math.sqrt(dist2(s,e));if(dd<130&&dd>1){e.x+=(s.x-e.x)/dd*70*dt;e.y+=(s.y-e.y)/dd*70*dt}}if(s.kind==='missile'&&s.target&&!s.target.dead){",
-`for(const s of shots){s.life-=dt;if(s.kind==='mine'){s.armed=Math.max(0,(s.armed??.35)-dt);s.pulse=(s.pulse||0)+dt;if(player.synergies.has('gravitywell'))for(const e of enemies){const dd=Math.sqrt(dist2(s,e));if(dd<145&&dd>1){e.x+=(s.x-e.x)/dd*82*dt;e.y+=(s.y-e.y)/dd*82*dt}}if(s.armed<=0){const trigger=82+player.modules.mine*6;let triggered=s.life<.25;for(const e of enemies)if(!e.dead&&dist2(s,e)<trigger*trigger){triggered=true;break}if(triggered){const radius=105+player.modules.mine*8;for(const e of enemies)if(!e.dead&&dist2(s,e)<radius*radius)damageEnemy(e,s.damage);burst(s.x,s.y,palette.cyan,24);shake=Math.max(shake,5);s.dead=true}}continue}if(s.kind==='missile'&&s.target&&!s.target.dead){`,'mine proximity logic');
+`for(const s of shots){s.life-=dt;if(s.kind==='mine'){s.armed=Math.max(0,(s.armed??.35)-dt);s.pulse=(s.pulse||0)+dt;if(player.synergies.has('gravitywell'))for(const e of nearbyEnemies(s.x,s.y,145)){const dd=Math.sqrt(dist2(s,e));if(dd<145&&dd>1){e.x+=(s.x-e.x)/dd*82*dt;e.y+=(s.y-e.y)/dd*82*dt}}if(s.armed<=0){const trigger=82+player.modules.mine*6;let triggered=s.life<.25;for(const e of nearbyEnemies(s.x,s.y,trigger))if(!e.dead&&dist2(s,e)<trigger*trigger){triggered=true;break}if(triggered){const radius=105+player.modules.mine*8;for(const e of nearbyEnemies(s.x,s.y,radius))if(!e.dead&&dist2(s,e)<radius*radius)damageEnemy(e,s.damage);burst(s.x,s.y,palette.cyan,24);shake=Math.max(shake,5);s.dead=true}}continue}if(s.kind==='missile'&&s.target&&!s.target.dead){`,'mine proximity logic');
+
+replace(" if(player.modules.orbit){const count=2+player.modules.orbit+(player.modules.orbit>=5?2:0);for(const e of enemies){",
+" rebuildEnemyGrid();if(player.modules.orbit){const count=2+player.modules.orbit+(player.modules.orbit>=5?2:0);for(const e of nearbyEnemies(player.x,player.y,145)){",'orbit spatial query');
+replace("for(const e of enemies){if(e.dead||s.dead)continue;if(dist2(s,e)<(s.r+e.r)**2){",
+"for(const e of nearbyEnemies(s.x,s.y,95)){if(e.dead||s.dead)continue;if(dist2(s,e)<(s.r+e.r)**2){",'projectile spatial query');
+replace("for(const q of enemies)if(dist2(s,q)<radius**2&&q!==e&&damageEnemy(q,s.damage*.5))q.dead=true;",
+"for(const q of nearbyEnemies(s.x,s.y,radius))if(dist2(s,q)<radius**2&&q!==e&&damageEnemy(q,s.damage*.5))q.dead=true;",'explosion spatial query');
 
 s=s.replace(/shots=shots\.filter\(s=>!s\.dead&&s\.life>0&&s\.x>-100&&s\.x<W\+100&&s\.y>-100&&s\.y<H\+100\);enemyShots=enemyShots\.filter\(s=>!s\.dead&&s\.life>0&&s\.x>-120&&s\.x<W\+120&&s\.y>-120&&s\.y<H\+120\);/,
 "shots=shots.filter(s=>!s.dead&&s.life>0&&Math.abs(s.x-player.x)<W*.85+250&&Math.abs(s.y-player.y)<H*.85+250);enemyShots=enemyShots.filter(s=>!s.dead&&s.life>0&&Math.abs(s.x-player.x)<W*.85+250&&Math.abs(s.y-player.y)<H*.85+250);if(shots.length>360)shots.splice(0,shots.length-360);if(enemyShots.length>220)enemyShots.splice(0,enemyShots.length-220);for(const l of lightningFx)l.life-=dt;lightningFx=lightningFx.filter(l=>l.life>0);if(particles.length>430)particles.splice(0,particles.length-430);if(gems.length>320)gems.splice(0,gems.length-320);");
@@ -62,4 +81,4 @@ if(!s.includes("Math.abs(s.x-player.x)<W*.85+250"))throw new Error('prepare-buil
 replace('function burst(x,y,color,n=8){for(let i=0;i<n;i++){','function burst(x,y,color,n=8){if(particles.length>400)n=Math.min(n,2);for(let i=0;i<n;i++){','particle cap');
 
 fs.writeFileSync(path,s);
-console.log('prepare-build: scrolling world + LOD + functional combat FX applied');
+console.log('prepare-build: scrolling world + LOD + spatial hash + functional combat FX applied');
