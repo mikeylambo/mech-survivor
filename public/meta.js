@@ -10,9 +10,9 @@ const worlds=[
  {name:'Crown Citadel',sub:'ENEMY COMMAND NEXUS',color:'#e5bc54'}
 ];
 const classes=[
- {id:'rook',name:'ROOK',mark:'R',desc:'Balanced combat frame. Reliable armor, weapons and mobility.',mods:['+10 integrity','+8% weapon damage','Stable all-range handling'],bonus:{hp:10,damage:.08}},
- {id:'lancer',name:'LANCER',mark:'L',desc:'High-speed aerial hunter built to maintain separation.',mods:['+18% movement speed','+20% pickup range','+10% critical chance'],bonus:{speed:.18,magnet:.2,crit:.1}},
- {id:'bulwark',name:'BULWARK',mark:'B',desc:'Heavy command chassis that thrives inside enemy density.',mods:['+35 maximum integrity','12% damage resistance','+0.5 integrity/sec'],bonus:{hp:35,armor:.12,regen:.5}}
+ {id:'rook',name:'ROOK',mark:'R',desc:'Balanced combat frame. Reliable armor, weapons and mobility.',mods:['Starts with Cobalt Rail','+10 integrity','+8% weapon damage'],bonus:{hp:10,damage:.08}},
+ {id:'lancer',name:'LANCER',mark:'L',desc:'High-speed hunter that fights from movement and close orbital pressure.',mods:['Starts with Aegis Blades + Vector Thrusters','+18% movement speed','+10% critical chance'],bonus:{speed:.18,magnet:.2,crit:.1}},
+ {id:'bulwark',name:'BULWARK',mark:'B',desc:'Heavy command chassis that owns space with armor and radial pressure.',mods:['Starts with Argent Plating + Nova Pulse','+35 maximum integrity','12% damage resistance'],bonus:{hp:35,armor:.12,regen:.5}}
 ];
 const shopItems=[
  {id:'damage',name:'Targeting Matrix',desc:'+5% weapon damage',base:60,max:10},
