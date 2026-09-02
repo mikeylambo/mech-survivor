@@ -32,4 +32,4 @@ Arcane enemies now use a deterministic `CreatureGenome` defined in `public/creat
 
 The player frame now uses the separate celestial visual renderer in the same module: strict symmetry/radial construction for the frame versus broken/asymmetric biological construction for enemies.
 
-<!-- deployment-sync: creature-lab-current-main -->
+<!-- deployment-sync: 2026-09-02-1406-current-main -->
