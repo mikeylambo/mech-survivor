@@ -53,18 +53,24 @@ test('full survivor punctuation and synergy layer is present',()=>{
  for(const token of ['ELITE_TIMES','spawnElite','spawnCache','openCache','synergies','RAILSTORM ARRAY','SERAPH HALO','AEGIS NOVA','GRAVITY WELL','FORTRESS DRIVE','syncSynergies'])assert.ok(game.includes(token),token+' missing');
 });
 
-test('mobile controls and scrolling-world performance guards are present',()=>{
+test('mobile controls scrolling camera and late-run performance guards are present',()=>{
  const html=fs.readFileSync(new URL('index.html',root),'utf8'),game=fs.readFileSync(new URL('game.js',root),'utf8'),css=fs.readFileSync(new URL('style.css',root),'utf8');
  for(const token of ['touch-controls','touch-stick','touch-dash'])assert.ok(html.includes(token));
- for(const token of ['touchMove','140-enemies.length','particles.length>520','drawCreatureSmart','W/2-player.x','COMMANDER // PHASE'])assert.ok(game.includes(token),token+' missing');
+ for(const token of ['touchMove','105-enemies.length','particles.length>430','gems.length>320','Math.abs(s.x-player.x)','COMMANDER // PHASE'])assert.ok(game.includes(token),token+' missing');
  assert.ok(css.includes('@media (pointer:coarse)'));
 });
+
+test('mines and Judgment Arc have visible functional combat behavior',()=>{
+ const game=fs.readFileSync(new URL('game.js',root),'utf8');
+ for(const token of ['lightningFx','drawLightning','kind===\'mine\'','armed:.35','trigger=82+player.modules.mine*6','radius=105+player.modules.mine*8','lightningFx.push'])assert.ok(game.includes(token),token+' missing');
+});
+
 test('procedural Arcane Creature genome system is deterministic and integrated',()=>{
   const creature=fs.readFileSync(new URL('creatures.js',root),'utf8');
   const game=fs.readFileSync(new URL('game.js',root),'utf8');
   const html=fs.readFileSync(new URL('index.html',root),'utf8');
   for(const token of ['generateCreatureGenome','hashSeed','bodyPlans','appendages','organs','mutations','behavior','drawArcaneCreature','drawCelestialFrame','mutateCreatureGenome'])assert.ok(creature.includes(token),token+' missing');
-  for(const token of ['genome=generateCreatureGenome','enemyShots','g.stats.projectiles','g.stats.spawner','drawArcaneCreature(ctx,e','drawCelestialFrame'])assert.ok(game.includes(token),token+' missing');
+  for(const token of ['genome=generateCreatureGenome','enemyShots','g.stats.projectiles','g.stats.spawner','drawCreatureSmart','drawCelestialFrame'])assert.ok(game.includes(token),token+' missing');
   for(const token of ['creature-lab-open','creature-grid','creature-seed','creature-mutant','creature-world','creature-detail'])assert.ok(html.includes(token),token+' missing');
 });
 test('creature mutations have gameplay-linked traits',()=>{
