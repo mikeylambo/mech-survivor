@@ -53,10 +53,10 @@ test('full survivor punctuation and synergy layer is present',()=>{
  for(const token of ['ELITE_TIMES','spawnElite','spawnCache','openCache','synergies','RAILSTORM ARRAY','SERAPH HALO','AEGIS NOVA','GRAVITY WELL','FORTRESS DRIVE','syncSynergies'])assert.ok(game.includes(token),token+' missing');
 });
 
-test('mobile controls and late-run performance guards are present',()=>{
+test('mobile controls and scrolling-world performance guards are present',()=>{
  const html=fs.readFileSync(new URL('index.html',root),'utf8'),game=fs.readFileSync(new URL('game.js',root),'utf8'),css=fs.readFileSync(new URL('style.css',root),'utf8');
  for(const token of ['touch-controls','touch-stick','touch-dash'])assert.ok(html.includes(token));
- for(const token of ['touchMove','260-enemies.length','particles.length>650','gems.length>450','COMMANDER // PHASE'])assert.ok(game.includes(token),token+' missing');
+ for(const token of ['touchMove','140-enemies.length','particles.length>520','drawCreatureSmart','W/2-player.x','COMMANDER // PHASE'])assert.ok(game.includes(token),token+' missing');
  assert.ok(css.includes('@media (pointer:coarse)'));
 });
 test('procedural Arcane Creature genome system is deterministic and integrated',()=>{
