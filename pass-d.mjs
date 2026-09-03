@@ -47,8 +47,8 @@ replace(
 );
 
 replace(
-  'synergies:new Set(),bonusChoices:0}',
-  'synergies:new Set(),blessings:new Set(),corruption:0,bonusChoices:0}',
+  'synergies:new Set(),bonusChoices:0,banishes:1,banished:new Set(),hitFx:0,healFx:0',
+  'synergies:new Set(),blessings:new Set(),corruption:0,bonusChoices:0,banishes:1,banished:new Set(),hitFx:0,healFx:0',
   'player blessing state'
 );
 
