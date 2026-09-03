@@ -22,8 +22,9 @@ test('every completed run produces persistent salvage-shaped objects',()=>{
  for(const item of items){assert.ok(SALVAGE_SLOTS.some(x=>x.id===item.slot));assert.ok(SALVAGE_RARITIES.some(x=>x.id===item.rarity));assert.ok(item.affixes.length>=1);assert.ok(salvageDismantleValue(item)>=1)}
 });
 
-test('runtime integrates director objective payouts and retention loop',()=>{
- const game=fs.readFileSync('./public/game.js','utf8'),meta=fs.readFileSync('./public/meta.js','utf8');
+test('runtime integrates director objective payouts and isolated retention loop',()=>{
+ const game=fs.readFileSync('./public/game.js','utf8'),retention=fs.readFileSync('./public/retention.js','utf8'),html=fs.readFileSync('./public/index.html','utf8');
  for(const token of ['createRunDirector','tickRunDirector','spawnFormation','OPPORTUNITY','CRISIS','director-objective','director:{completed'])assert.ok(game.includes(token),token+' missing');
- for(const token of ['generateRunSalvage','reward-reveal','GARAGE','renderGarage','reliquary','DISMANTLE','salvage:[]'])assert.ok(meta.includes(token),token+' missing');
+ for(const token of ['generateRunSalvage','reward-reveal','GARAGE','renderGarage','reliquary','DISMANTLE','mech-survivor-retention-v1'])assert.ok(retention.includes(token),token+' missing');
+ assert.ok(html.includes('retention.js'));
 });
