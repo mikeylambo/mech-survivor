@@ -1,8 +1,10 @@
 import {deckForWorld} from './sector-content.js';
+import {OBJECTIVE_ARCHETYPES} from './director.js';
 const TAU=Math.PI*2;
 const ready=(s,key,dt,base)=>{s[key]=(s[key]??base)-dt;if(s[key]<=0){s[key]=base;return true}return false};
 const pushShot=(arr,x,y,a,speed,damage,r=4,life=4)=>arr.push({x,y,vx:Math.cos(a)*speed,vy:Math.sin(a)*speed,r,life,damage,kind:'sector-pressure'});
 function stateFor(player){return player._sectorRt||(player._sectorRt={});}
+export function applySectorDeck(director,deck){if(!director||!deck)return director;director.sectorDeck=deck.id;for(let i=0;i<director.slots.length;i++){const slot=director.slots[i],id=deck.objectives[i%deck.objectives.length],a=OBJECTIVE_ARCHETYPES[id]||OBJECTIVE_ARCHETYPES.purge;slot.archetypeId=a.id;slot.label=a.label;slot.metric=a.metric;slot.formation=deck.formations[i%deck.formations.length];slot.target=Math.max(1,Math.round(a.baseTarget*(1+director.world*.12)*(slot.kind==='crisis'?1.35:1)));slot.payout=Math.round(a.payout*(1+director.world*.18)*(slot.kind==='crisis'?1.4:1))}return director}
 export function tickSectorRuntime({world=0,player,enemies,enemyShots,dt,elapsed,spawnEnemy,toast}){
  const s=stateFor(player),deck=deckForWorld(world),phase=elapsed<110?0:elapsed<250?1:elapsed<360?2:elapsed<420?3:4;
  if(s.world!==world){s.world=world;s.announced=false;s.lane=0;s.angle=0}
