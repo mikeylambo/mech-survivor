@@ -3,14 +3,12 @@ const path='public/game.js';
 let s=fs.readFileSync(path,'utf8');
 const must=(ok,label)=>{if(!ok)throw new Error('pass-i: missing '+label)};
 if(!s.includes("from './content-v1.js'")){
- const anchor="import {tickConfigurationRuntime,drawConfigurationField} from './configuration-runtime.js';";
+ const anchor="import {tickConfigurations,configurationDamageModifier} from './configuration-runtime.js';";
  must(s.includes(anchor),'configuration import');
  s=s.replace(anchor,anchor+"\nimport {ALL_BLESSINGS} from './content-v1.js';\nimport {bossForWorld,deckForWorld} from './sector-content.js';");
 }
-// Replace the small prototype blessing list with the full authored library.
 const br=/const blessings=\[[\s\S]*?\n\];\nfunction activeSynergies/;
 if(br.test(s))s=s.replace(br,"const blessings=ALL_BLESSINGS;\nfunction activeSynergies");
-// Sector identity now drives Director presentation and boss data.
 if(!s.includes('player.sectorDeck=deckForWorld(activeWorld)')){
  const anchor="director=createRunDirector({world:activeWorld,seed:String(activeWorld)+'-'+Date.now()});";
  must(s.includes(anchor),'director reset');
@@ -21,7 +19,7 @@ if(!s.includes('const bossProfile=bossForWorld(activeWorld)')){
  must(s.includes(anchor),'spawn genome seam');
  s=s.replace(anchor,"if(t==='boss'){const bossProfile=bossForWorld(activeWorld);spec.hp*=bossProfile.hp;spec.speed*=bossProfile.speed;spec.damage*=bossProfile.damage;spec.bossId=bossProfile.id;spec.bossName=bossProfile.name;spec.bossPattern=bossProfile.pattern;spec.bossPhases=bossProfile.phases}\n"+anchor);
 }
-if(!s.includes("bossProfile?.name")){
+if(!s.includes("WARNING // '+bossProfile.name")){
  const anchor="if(!finalBossSpawned&&elapsed>=RUN_DURATION){finalBossSpawned=true;bossIndex=activeWorld+1;spawnEnemy(true);";
  if(s.includes(anchor))s=s.replace(anchor,"if(!finalBossSpawned&&elapsed>=RUN_DURATION){finalBossSpawned=true;bossIndex=activeWorld+1;const bossProfile=bossForWorld(activeWorld);spawnEnemy(true);$('#boss-alert').textContent='WARNING // '+bossProfile.name;");
 }
