@@ -1,0 +1,6 @@
+@media (pointer:coarse){
+  #touch-controls{display:block}
+  .screen:not(.hidden)~#touch-controls{display:none!important}
+  #touch-controls{z-index:20}
+  #touch-stick,#touch-dash{pointer-events:auto}
+}
