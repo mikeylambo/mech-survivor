@@ -3,4 +3,17 @@
   .screen:not(.hidden)~#touch-controls{display:none!important}
   #touch-controls{z-index:20}
   #touch-stick,#touch-dash{pointer-events:auto}
+  #levelup{padding-top:calc(12px + env(safe-area-inset-top,0px))}
+  #levelup h2{font-size:34px;margin:2px 0}
+  #levelup>p{font-size:10px;letter-spacing:2px;margin:0 0 6px}
+  #choices{gap:8px;margin-top:6px}
+  .choice{padding:12px 14px;min-height:0}
+  .choice .type{font-size:9px;letter-spacing:2px}
+  .choice h3{font-size:23px;margin:3px 0 5px}
+  .choice .effect{display:block;font-size:17px;line-height:1.05;padding:7px 9px;margin:3px 0 5px;letter-spacing:.5px}
+  .choice .level{font-size:10px;margin:4px 0;color:#78e7ff;letter-spacing:1.4px}
+  .choice .choice-copy{font-size:11px;line-height:1.25;margin:5px 0 0;color:#8fa7bd;letter-spacing:0}
+  .choice.evolution .effect{border-color:#d6ae52;box-shadow:inset 3px 0 0 #ffe078}
+  #reward-reveal{justify-content:flex-start;padding-top:calc(18px + env(safe-area-inset-top,0px));overflow-y:auto}
+  #reward-continue{position:sticky;bottom:calc(10px + env(safe-area-inset-bottom,0px));width:min(420px,92vw);min-height:52px;margin:12px auto;background:linear-gradient(100deg,#0874c8,#17b9ef);z-index:30}
 }
