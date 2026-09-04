@@ -6,8 +6,8 @@ if(!s.includes('stick.y+(keys.has')){
  must(s.includes(from),'touch Y input seam');s=s.replace(from,to);
 }
 if(!s.includes('const mobileCamera=W<760')){
- const from='ctx.save();ctx.translate(W/2-player.x,H/2-player.y);for(const c of caches)';
- const to="ctx.save();const mobileCamera=W<760,camZoom=mobileCamera?1.18:1,camY=mobileCamera?H*.46:H/2;ctx.translate(W/2,camY);ctx.scale(camZoom,camZoom);ctx.translate(-player.x,-player.y);for(const c of caches)";
+ const from='ctx.translate(W/2-player.x,H/2-player.y);';
+ const to="const mobileCamera=W<760,camZoom=mobileCamera?1.18:1,camY=mobileCamera?H*.46:H/2;ctx.translate(W/2,camY);ctx.scale(camZoom,camZoom);ctx.translate(-player.x,-player.y);";
  must(s.includes(from),'camera transform seam');s=s.replace(from,to);
 }
 if(!s.includes("class=\"choice-copy\"")){
