@@ -31,5 +31,3 @@ Every chosen upgrade mutates both combat behavior and the rendered mech silhouet
 Arcane enemies now use a deterministic `CreatureGenome` defined in `public/creatures.js`. Body plan, appendages, organs, mutations, behavior, palette and derived gameplay stats are generated from a seed. The main menu includes a Creature Lab for batch generation, seed inspection and one-trait mutation. See `CREATURE_SYSTEM.md` for the reusable contract.
 
 The player frame now uses the separate celestial visual renderer in the same module: strict symmetry/radial construction for the frame versus broken/asymmetric biological construction for enemies.
-
-<!-- deployment-sync: 2026-09-02-1406-current-main -->
