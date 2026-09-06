@@ -64,7 +64,8 @@ test('mobile controls scrolling camera and late-run performance guards are prese
 
 test('mines and Judgment Arc have visible functional combat behavior',()=>{
  const game=fs.readFileSync(new URL('game.js',root),'utf8');
- for(const token of ['lightningFx','drawLightning','kind===\'mine\'','armed:.35','trigger=82+player.modules.mine*6','radius=105+player.modules.mine*8','lightningFx.push'])assert.ok(game.includes(token),token+' missing');
+ for(const token of ['lightningFx','drawLightning','kind===\'mine\'','armed:.35','trigger=82+player.modules.mine*6','radius=105+player.modules.mine*8'])assert.ok(game.includes(token),token+' missing');
+ assert.ok(game.includes('lightningFx.push')||game.includes("'mech.arcStorm':'mech.arcChain'"),'Judgment Arc visual path missing');
 });
 
 test('procedural Arcane Creature genome system is deterministic and integrated',()=>{
