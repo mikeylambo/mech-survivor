@@ -51,12 +51,25 @@ export function createRng(seed = 1) {
   return next;
 }
 
-/** The stream a run uses. Replaced on every reset(); never global Math.random. */
+// Two streams, forked from the same seed.
+//
+// Simulation and presentation are separated on purpose: if a particle burst
+// drew from the same stream as a spawn roll, turning off screen shake would
+// change what the game spawned. Cosmetics must never be able to move the run.
 let current = createRng(1);
+let cosmetic = createRng(2);
+
 export function setRunSeed(seed) {
   current = createRng(seed);
+  cosmetic = createRng(hashSeed(`${seed}:fx`));
   return current;
 }
 export function runRng() { return current; }
-/** Convenience: the run's own float, for call sites that just want a number. */
+export function fxRng() { return cosmetic; }
+
+/** Gameplay randomness. Everything that can change the outcome of a run. */
+export const srand = () => current();
+/** Presentation randomness. Particles, jitter, anything the sim cannot see. */
+export const frand = () => cosmetic();
+/** Convenience alias kept for call sites that just want the run's own float. */
 export const rand01 = () => current();

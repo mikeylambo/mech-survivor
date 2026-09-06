@@ -1,12 +1,13 @@
 import {ARSENAL_BY_ID,familyPower} from './arsenal.js';
 import {mv,mvFor} from './arsenal-metrics.js';
+import {srand} from './run-rng.js';
 // Cooldowns are read before profile() runs, so they go through the raw state.
 const M=(id,key,p)=>mvFor(p,id,key,state(p,id));
 const TAU=Math.PI*2;
 const rt=(p,id)=>p._arsenalRt||(p._arsenalRt={}), key=>{};
 const state=(p,id)=>p.arsenal?.[id]||{tier:0,branch:null,evo:0};
 const lvl=(p,id)=>familyPower(state(p,id));
-const ready=(p,id,dt,base)=>{const r=p._arsenalRt||(p._arsenalRt={});r[id]=(r[id]??Math.random()*base)-dt;if(r[id]<=0){r[id]=base;return true}return false};
+const ready=(p,id,dt,base)=>{const r=p._arsenalRt||(p._arsenalRt={});r[id]=(r[id]??srand()*base)-dt;if(r[id]<=0){r[id]=base;return true}return false};
 const nearest=(enemies,x,y)=>{let b=null,d=Infinity;for(const e of enemies){if(e.dead)continue;const dd=(e.x-x)**2+(e.y-y)**2;if(dd<d){d=dd;b=e}}return b};
 const strongest=enemies=>[...enemies].filter(e=>!e.dead).sort((a,b)=>(b.hp||0)-(a.hp||0))[0];
 const shot=(shots,x,y,a,speed,damage,kind='arsenal',extra={})=>shots.push({x,y,vx:Math.cos(a)*speed,vy:Math.sin(a)*speed,r:extra.r||3,life:extra.life||1.5,damage,kind,pierce:extra.pierce||0,ricochet:extra.ricochet||0,target:extra.target,turn:extra.turn||0});
@@ -24,7 +25,7 @@ const {enemies,shots,enemyShots,damageEnemy,elapsed}=c;const cfg=p.configuration
  const has=id=>(state(p,id).tier||0)>0;
  // Kinetic families
  if(has('rail')&&ready(p,'rail',dt,M('rail','cooldown',p))){const q=profile(p,'rail'),e=nearest(enemies,p.x,p.y);if(e){const a=Math.atan2(e.y-p.y,e.x-p.x),n=mv('rail','shots',q.s);for(let i=0;i<n;i++)shot(shots,p.x,p.y,a+(i-(n-1)/2)*.07,900,mv('rail','damage',q.s),'rail',{pierce:mv('rail','pierce',q.s)+(cfg.has('gravity-spear')?2:0),r:q.branch==='a'?5:3});fx(p,'line',{x:p.x,y:p.y,a,len:220,life:.12})}}
- if(has('repeater')&&ready(p,'repeater',dt,M('repeater','cooldown',p))){const q=profile(p,'repeater'),e=nearest(enemies,p.x,p.y);if(e){const a=Math.atan2(e.y-p.y,e.x-p.x),n=mv('repeater','shots',q.s);for(let i=0;i<n;i++)shot(shots,p.x,p.y,a+(Math.random()-.5)*.06,700,mv('repeater','damage',q.s),'repeater',{r:q.branch==='b'?5:2,ricochet:cfg.has('ballistic-cyclone')?1:0})}}
+ if(has('repeater')&&ready(p,'repeater',dt,M('repeater','cooldown',p))){const q=profile(p,'repeater'),e=nearest(enemies,p.x,p.y);if(e){const a=Math.atan2(e.y-p.y,e.x-p.x),n=mv('repeater','shots',q.s);for(let i=0;i<n;i++)shot(shots,p.x,p.y,a+(srand()-.5)*.06,700,mv('repeater','damage',q.s),'repeater',{r:q.branch==='b'?5:2,ricochet:cfg.has('ballistic-cyclone')?1:0})}}
  if(has('scatter')&&ready(p,'scatter',dt,M('scatter','cooldown',p))){const q=profile(p,'scatter'),e=nearest(enemies,p.x,p.y);if(e){const a=Math.atan2(e.y-p.y,e.x-p.x),n=mv('scatter','pellets',q.s),spread=mv('scatter','spread',q.s);for(let i=0;i<n;i++)shot(shots,p.x,p.y,a+(i-(n-1)/2)*spread/Math.max(1,n-1),620,mv('scatter','damage',q.s),'scatter',{pierce:q.branch==='b'?1+q.e:0})}}
  if(has('ricochet')&&ready(p,'ricochet',dt,M('ricochet','cooldown',p))){const q=profile(p,'ricochet'),e=nearest(enemies,p.x,p.y);if(e){const a=Math.atan2(e.y-p.y,e.x-p.x);shot(shots,p.x,p.y,a,580,mv('ricochet','damage',q.s),'ricochet',{ricochet:mv('ricochet','bounces',q.s),r:q.branch==='b'?7:3})}}
  if(has('hunter')&&ready(p,'hunter',dt,M('hunter','cooldown',p))){const q=profile(p,'hunter'),target=q.branch==='b'?strongest(enemies):nearest(enemies,p.x,p.y);if(target){const n=mv('hunter','shots',q.s);for(let i=0;i<n;i++)shot(shots,p.x,p.y,-Math.PI/2+(i-(n-1)/2)*.1,260,mv('hunter','damage',q.s),'hunter',{target,turn:4.5,r:4,life:3})}}
@@ -43,7 +44,7 @@ const {enemies,shots,enemyShots,damageEnemy,elapsed}=c;const cfg=p.configuration
  if(has('missile')&&ready(p,'missile2',dt,M('missile','cooldown',p))){const q=profile(p,'missile'),target=nearest(enemies,p.x,p.y);if(target){const n=mv('missile','shots',q.s);for(let i=0;i<n;i++)shot(shots,p.x,p.y,-Math.PI/2+(i-(n-1)/2)*.08,220,mv('missile','damage',q.s),'missile',{target,turn:4,r:q.branch==='b'?7:4,life:3})}}
  if(has('mortar')&&ready(p,'mortar',dt,M('mortar','cooldown',p))){const q=profile(p,'mortar'),e=nearest(enemies,p.x,p.y);if(e){const r=mv('mortar','radius',q.s);area(enemies,e.x,e.y,r,mv('mortar','damage',q.s),damageEnemy);fx(p,'ring',{x:e.x,y:e.y,r,life:.35})}}
  if(has('cluster')&&ready(p,'cluster',dt,M('cluster','cooldown',p))){const q=profile(p,'cluster'),e=nearest(enemies,p.x,p.y);if(e){const n=mv('cluster','bomblets',q.s),a0=Math.atan2(e.y-p.y,e.x-p.x);for(let i=0;i<n;i++)shot(shots,p.x,p.y,a0+(i-(n-1)/2)*.18,420,mv('cluster','damage',q.s),'cluster',{pierce:state(p,'cluster').tier>=4?1:0})}}
- if(has('mine')&&ready(p,'mine2',dt,M('mine','cooldown',p))){const q=profile(p,'mine'),n=mv('mine','mines',q.s);for(let i=0;i<n;i++)shots.push({x:p.x+(Math.random()-.5)*28,y:p.y+(Math.random()-.5)*28,vx:0,vy:0,r:q.branch==='b'?12:8,life:7,damage:mv('mine','damage',q.s),kind:'mine',pierce:0})}
+ if(has('mine')&&ready(p,'mine2',dt,M('mine','cooldown',p))){const q=profile(p,'mine'),n=mv('mine','mines',q.s);for(let i=0;i<n;i++)shots.push({x:p.x+(srand()-.5)*28,y:p.y+(srand()-.5)*28,vx:0,vy:0,r:q.branch==='b'?12:8,life:7,damage:mv('mine','damage',q.s),kind:'mine',pierce:0})}
  if(has('plasma')&&ready(p,'plasma',dt,M('plasma','cooldown',p))){const q=profile(p,'plasma'),e=nearest(enemies,p.x,p.y);if(e){const r=mv('plasma','radius',q.s);area(enemies,e.x,e.y,r,mv('plasma','damage',q.s),damageEnemy);fx(p,'zone',{x:e.x,y:e.y,r,life:mv('plasma','duration',q.s)})}}
  // Autonomous, defense, control
  if(has('drone')&&ready(p,'drone2',dt,M('drone','cooldown',p))){const q=profile(p,'drone'),e=nearest(enemies,p.x,p.y);if(e){const n=mv('drone','units',q.s);for(let i=0;i<n;i++){const a=i*TAU/n+elapsed;shot(shots,p.x+Math.cos(a)*60,p.y+Math.sin(a)*60,Math.atan2(e.y-p.y,e.x-p.x),560,mv('drone','damage',q.s),'drone')}}}

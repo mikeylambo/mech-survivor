@@ -4,6 +4,7 @@ import {
  PYLON_DAMAGE_SHARE,
  ANTI_SUMMON_CLEAR_SHARE,
 } from './commander-doctrine.js';
+import {srand} from './run-rng.js';
 const TAU=Math.PI*2;
 const ready=(e,key,dt,base)=>{e._bossRt||(e._bossRt={});e._bossRt[key]=(e._bossRt[key]??base)-dt;if(e._bossRt[key]<=0){e._bossRt[key]=base;return true}return false};
 const pushShot=(arr,x,y,a,speed,damage,r=5,life=4)=>arr.push({x,y,vx:Math.cos(a)*speed,vy:Math.sin(a)*speed,r,life,damage,kind:'boss-pattern'});
@@ -103,7 +104,7 @@ function tickDoctrine(boss,ctx,phase){
  if(profile.displaceInterval>0){
   if(boss._displacing&&boss._telegraph<=0){
    boss._displacing=false;
-   const a=Math.random()*TAU,r=360+Math.random()*140;
+   const a=srand()*TAU,r=360+srand()*140;
    boss.x=player.x+Math.cos(a)*r;boss.y=player.y+Math.sin(a)*r;
    boss._exposed=Math.max(boss._exposed,profile.exposedWindow);
    boss._doctrineEvent='DISPLACE';
@@ -114,7 +115,7 @@ function tickDoctrine(boss,ctx,phase){
 
  // MOBILE — pays for its own repositioning with an opening.
  if(profile.repositionInterval>0&&(boss._exposed||0)<=0&&ready(boss,'reposition',dt,profile.repositionInterval)){
-  const a=Math.atan2(boss.y-player.y,boss.x-player.x)+(Math.random()<.5?1:-1)*(.7+Math.random()*.6);
+  const a=Math.atan2(boss.y-player.y,boss.x-player.x)+(srand()<.5?1:-1)*(.7+srand()*.6);
   boss.x=player.x+Math.cos(a)*300;boss.y=player.y+Math.sin(a)*300;
   boss._exposed=Math.max(boss._exposed,profile.exposedWindow);
   boss._doctrineEvent='REPOSITION';

@@ -1,3 +1,8 @@
+import {runRng} from './run-rng.js';
+// Records are numbered off the run stream, not the clock: the same seed must
+// produce the same salvage ids and the same codex order.
+let _tick=0;
+const runTick=()=>{_tick+=1;return Math.floor(runRng()()*1e6)*1000+_tick};
 import {ARSENAL_FAMILIES} from './arsenal.js';
 import {CONFIGURATIONS} from './configurations.js';
 import {BOSSES,SECTOR_DECKS,SALVAGE_FAMILIES} from './sector-content.js';
@@ -13,7 +18,7 @@ const THREATS=[
 const defaults={visitedSectors:[],defeatedBosses:[],weapons:[],configurations:[],relicFamilies:[],circuitClears:[],runs:0,wins:0,bestKills:0,bestLevel:0,bestTime:0,unseen:0,lastDiscovery:0};
 function load(){try{return{...structuredClone(defaults),...JSON.parse(localStorage.getItem(KEY)||'{}')}}catch{return structuredClone(defaults)}}let save=load();
 function persist(){localStorage.setItem(KEY,JSON.stringify(save));renderBadge()}
-function add(arr,id){if(id==null||save[arr].includes(id))return false;save[arr].push(id);save.unseen++;save.lastDiscovery=Date.now();return true}
+function add(arr,id){if(id==null||save[arr].includes(id))return false;save[arr].push(id);save.unseen++;save.lastDiscovery=runTick();return true}
 function recordRun(summary,won){let changed=false;save.runs++;if(won)save.wins++;save.bestKills=Math.max(save.bestKills,summary.kills||0);save.bestLevel=Math.max(save.bestLevel,summary.level||0);save.bestTime=Math.max(save.bestTime,summary.time||0);changed=add('visitedSectors',summary.world)||changed;for(const [id,state] of Object.entries(summary.arsenal||{}))if((state?.tier||0)>0)changed=add('weapons',id)||changed;for(const id of summary.configurations||[])changed=add('configurations',id)||changed;if(won){const boss=BOSSES.find(b=>b.world===summary.world);if(boss)changed=add('defeatedBosses',boss.id)||changed;const circuit=window.MechCircuit?.selected;if(summary.world===4&&circuit&&circuit!=='off')changed=add('circuitClears',circuit)||changed}try{const r=JSON.parse(localStorage.getItem('mech-survivor-retention-v2')||localStorage.getItem('mech-survivor-retention-v1')||'{}');for(const item of r.salvage||[])if(item.familyKey)changed=add('relicFamilies',item.familyKey)||changed}catch{}persist();return changed}
 function pct(){const total=5+BOSSES.length+ARSENAL_FAMILIES.length+CONFIGURATIONS.length+SALVAGE_FAMILIES.length+ENDGAME_TIERS.length;const got=save.visitedSectors.length+save.defeatedBosses.length+save.weapons.length+save.configurations.length+save.relicFamilies.length+save.circuitClears.length;return{got,total,pct:Math.round(got/total*100)}}
 function card(title,sub,desc,known=true,extra=''){return '<article class="shop-card codex-card '+(known?'known':'unknown')+'"><div class="tier">'+sub+'</div><h3>'+(known?title:'???')+'</h3><p>'+(known?desc:'DATA UNRESOLVED // Encounter or construct this subject to archive it.')+'</p>'+extra+'</article>'}

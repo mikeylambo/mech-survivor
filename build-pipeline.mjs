@@ -30,4 +30,5 @@ export const PASSES = [
   'pass-y-orbit.mjs',
   'pass-z-radar.mjs',
   'pass-aa-alignments.mjs',
+  'pass-ac-determinism.mjs',
 ];
