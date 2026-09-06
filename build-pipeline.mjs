@@ -23,4 +23,5 @@ export const PASSES = [
   'pass-r-gameplay-depth.mjs',
   'pass-s-arsenal-identity.mjs',
   'pass-t-performance-impact.mjs',
+  'pass-u-commander.mjs',
 ];
