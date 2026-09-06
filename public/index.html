@@ -65,10 +65,22 @@
   </section>
   <section id="settings" class="screen hidden panel-screen">
     <div class="kicker">SYSTEM CONFIGURATION</div><h2>SETTINGS</h2><div class="settings-list"><div class="volumes">
-      <label>MASTER<input id="vol-master" type="range" min="0" max="100" step="1" value="100"><b id="vol-master-val">100</b></label>
-      <label>MUSIC<input id="vol-music" type="range" min="0" max="100" step="1" value="60"><b id="vol-music-val">60</b></label>
-      <label>EFFECTS<input id="vol-sfx" type="range" min="0" max="100" step="1" value="90"><b id="vol-sfx-val">90</b></label>
-    </div><button id="toggle-vfx">SCREEN SHAKE <b>ON</b></button><button id="toggle-grid">ARENA GRID <b>ON</b></button><button id="reset-save">RESET SAVE DATA</button></div><button class="back-context">‹ BACK</button>
+      <label>MASTER<input id="vol-master" class="pad-slider" type="range" min="0" max="100" step="1" value="100"><b id="vol-master-val">100</b></label>
+      <label>MUSIC<input id="vol-music" class="pad-slider" type="range" min="0" max="100" step="1" value="60"><b id="vol-music-val">60</b></label>
+      <label>EFFECTS<input id="vol-sfx" class="pad-slider" type="range" min="0" max="100" step="1" value="90"><b id="vol-sfx-val">90</b></label>
+    </div>
+    <div class="volumes a11y-group">
+      <div class="group-head">PRESENTATION</div>
+      <label>SCREEN SHAKE<input id="a11y-shake" class="pad-slider" type="range" min="0" max="100" step="10" value="100"><b id="a11y-shake-val">100</b></label>
+      <label>SCREEN FLASH<input id="a11y-flash" class="pad-slider" type="range" min="0" max="100" step="10" value="100"><b id="a11y-flash-val">100</b></label>
+      <label>TEXT SIZE<input id="a11y-text" class="pad-slider" type="range" min="80" max="160" step="10" value="100"><b id="a11y-text-val">100</b></label>
+    </div><button id="a11y-palette">DANGER COLOURS <b>DEFAULT</b></button>
+    <div class="volumes a11y-group assists">
+      <div class="group-head">ASSISTS <span>recorded, never restricted</span></div>
+      <label>DAMAGE TAKEN<input id="a11y-damage" class="pad-slider" type="range" min="25" max="150" step="5" value="100"><b id="a11y-damage-val">100</b></label>
+      <label>GAME SPEED<input id="a11y-speed" class="pad-slider" type="range" min="60" max="120" step="5" value="100"><b id="a11y-speed-val">100</b></label>
+      <div class="assist-record">RECORDED AS <b id="a11y-assist-label">UNASSISTED</b></div>
+    </div><button id="toggle-grid">ARENA GRID <b>ON</b></button><button id="reset-save">RESET SAVE DATA</button></div><button class="back-context">‹ BACK</button>
   </section>
   <section id="pause-screen" class="screen hidden panel-screen"><div class="kicker">SORTIE SUSPENDED</div><h2>PAUSED</h2><div class="menu-stack"><button id="resume">RESUME</button><button id="pause-settings">SETTINGS</button><button id="restart">RESTART</button><button id="forfeit">FORFEIT & SAVE</button><button id="quit-menu">MAIN MENU</button></div></section>
   <section id="levelup" class="screen hidden">

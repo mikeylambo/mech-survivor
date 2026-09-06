@@ -149,6 +149,21 @@ class FakeElement {
   toDataURL() { return 'data:,'; }
 }
 
+// A real Event exists in every browser the game runs in, so runtime code should
+// be able to construct one rather than branch on the environment.
+class FakeEvent {
+  constructor(type, init = {}) {
+    this.type = String(type);
+    this.bubbles = !!init.bubbles;
+    this.cancelable = !!init.cancelable;
+    this.detail = init.detail;
+    this.target = null;
+    this.defaultPrevented = false;
+  }
+  preventDefault() { this.defaultPrevented = true; }
+  stopPropagation() {}
+}
+
 // --- selector matching -------------------------------------------------------
 // Only the shapes this codebase actually uses: `#id`, `.class`, `tag`,
 // `tag.class`, `tag:not([disabled])` and comma-separated groups of those.
@@ -373,6 +388,7 @@ export function installBrowserEnvironment() {
     AudioContext: undefined,
     webkitAudioContext: undefined,
     confirm: () => true,
+    Event: FakeEvent,
   };
 
   // Node defines `navigator` and `performance` as getter-only globals, so every
@@ -397,6 +413,7 @@ export function installBrowserEnvironment() {
     devicePixelRatio: 1,
     innerWidth: win.innerWidth,
     innerHeight: win.innerHeight,
+    Event: FakeEvent,
     HTMLElement: FakeElement,
     Element: FakeElement,
     performance: win.performance,
@@ -417,13 +434,13 @@ export function installBrowserEnvironment() {
     $: (sel) => document.querySelector(sel),
     /** Attach/detach the fake controller. */
     setGamepadAttached(on) { gamepadAttached = on; },
-    /** Every enabled button the game would consider on-screen right now. */
+    /** Every enabled control the game would consider on-screen right now. */
     visibleButtons() {
-      return document.querySelectorAll('button:not([disabled])').filter((b) => b.offsetParent !== null && !b.classList.contains('hidden'));
+      return document.querySelectorAll('button:not([disabled]),.pad-slider:not([disabled])').filter((b) => b.offsetParent !== null && !b.classList.contains('hidden'));
     },
-    /** The button the pad would activate, or null. */
+    /** The control the pad would act on, or null. Sliders are targets too. */
     focusedButton() {
-      return document.querySelectorAll('button').find((b) => b.classList.contains('gamepad-focus')) || null;
+      return document.querySelectorAll('button,.pad-slider').find((b) => b.classList.contains('gamepad-focus')) || null;
     },
     /** Fire a window-level event (the game listens on the window for input). */
     emit(type, detail = {}) {

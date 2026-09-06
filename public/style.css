@@ -47,3 +47,31 @@ body.landscape #touch-stick i{width:34px;height:34px;left:27px;top:27px}
 body.landscape #touch-dash{bottom:max(14px,calc(var(--safe-b) + 10px));width:72px;height:72px}
 body.landscape .screen{justify-content:flex-start;overflow-y:auto}
 body.landscape #commander-card{top:16%}
+
+/* Accessibility.
+   --text-scale is set on <html> by accessibility.js. Font sizes in this sheet
+   are absolute px, so scaling has to be restated rather than inherited: these
+   are the surfaces a player actually reads — HUD labels, build list, toasts,
+   panel copy and the settings themselves. Canvas damage numbers scale in JS,
+   because they are drawn, not styled. */
+:root{--text-scale:1}
+.systems label{font-size:calc(10px * var(--text-scale))}
+#build h3{font-size:calc(11px * var(--text-scale))}
+#toast{font-size:calc(16px * var(--text-scale))}
+.kicker{font-size:calc(12px * var(--text-scale))}
+.shop-card p,.award-card p{font-size:calc(12px * var(--text-scale))}
+.settings-list .volumes label{font-size:calc(11px * var(--text-scale))}
+.settings-list .volumes b{font-size:calc(12px * var(--text-scale))}
+.world-card p{font-size:calc(11px * var(--text-scale))}
+
+/* Presentation reducers also switch off the CSS-driven pulses, so a player who
+   turns shake and flash down does not still get them from the stylesheet. */
+body.reduce-flash #combat-vignette,body.reduce-flash #scanlines{animation:none!important}
+body.reduce-shake .screen,body.reduce-shake #hud{animation:none!important}
+
+.settings-list .a11y-group .group-head{font:700 10px Rajdhani;letter-spacing:3px;color:var(--gold);text-transform:uppercase}
+.settings-list .a11y-group .group-head span{color:#7e93a8;letter-spacing:1.5px;text-transform:none;font-weight:500}
+.settings-list .a11y-group label{grid-template-columns:110px 1fr 38px}
+.settings-list .assists{border-color:#7a5f2a;background:#150f04cc}
+.settings-list .assist-record{font:700 10px Rajdhani;letter-spacing:2px;color:#8fa6bb}
+.settings-list .assist-record b{color:var(--gold);letter-spacing:2px}

@@ -31,4 +31,5 @@ export const PASSES = [
   'pass-z-radar.mjs',
   'pass-aa-alignments.mjs',
   'pass-ac-determinism.mjs',
+  'pass-ad-accessibility.mjs',
 ];

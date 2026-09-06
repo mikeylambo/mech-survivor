@@ -75,6 +75,19 @@ test('Gate A: the same seed reproduces the same stream, a different one does not
   assert.deepEqual(Array.from({length: 5}, () => createRng(9)()), Array.from({length: 5}, () => createRng(9)()));
 });
 
+test('Gate A: the draw path never draws from the simulation stream', () => {
+  // A presentation setting that skips a draw-time random call would otherwise
+  // shift every simulation draw after it. accessibility.test.mjs proves the
+  // behaviour; this pins the mechanism so it cannot regress quietly.
+  const src = fs.readFileSync(new URL('./public/game.js', import.meta.url), 'utf8');
+  const drawStart = src.indexOf('function draw(){');
+  assert.ok(drawStart > 0, 'draw() should exist');
+  const drawBody = src.slice(drawStart);
+  assert.ok(drawBody.includes('frnd(-sh,sh)'), 'the shake offset draws from the cosmetic stream');
+  assert.ok(!/ctx\.translate\(rand\(/.test(drawBody), 'and not from the run stream');
+  assert.ok(src.includes('(frand()-.5)*16*alpha'), 'the lightning jitter is cosmetic too');
+});
+
 // --- Gate B ------------------------------------------------------------------
 
 const SCRIPT = [

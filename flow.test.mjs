@@ -354,3 +354,150 @@ test('the pad can reach a space inside the Observatory and back out to it', () =
   assert.ok(visible('#title'), 'B from the hub returns to the title');
   resetInput();
 });
+
+// --- controller parity across every screen the Full Send workstreams touched --
+//
+// WS1-8 added or rebuilt the arsenal cards, the Observatory and its spaces, the
+// orbit list, the radar HUD and the settings screen. A pad-only player has to
+// be able to reach all of it, so this walks the set rather than spot-checking.
+
+const padStep = (button) => {
+  env.gamepad.buttons[button].pressed = true;
+  env.frames(2);
+  env.gamepad.buttons[button].pressed = false;
+  env.frames(3);
+};
+const padRight = () => padStep(15);
+const padA = () => padStep(0);
+const padB = () => padStep(1);
+
+/** Walk down the list until the focused control has `id`, then return it.
+ *  Down rather than right: on a slider, right is the value, not the list. */
+function walkTo(id, limit = 24) {
+  for (let i = 0; i < limit && env.focusedButton()?.id !== id; i++) padStep(13);
+  assert.equal(env.focusedButton()?.id, id, `the pad should be able to reach #${id}`);
+  return env.focusedButton();
+}
+
+test('every screen the title can open hands focus to its own controls', () => {
+  resetInput();
+  goToTitle();
+  env.setGamepadAttached(true);
+  env.frames(3);
+
+  // [button to press, screen it opens, a control that must live inside it]
+  const routes = [
+    ['orbit-select', '#worlds', '#world-list, #worlds button'],
+    ['settings-open', '#settings', '#a11y-palette'],
+    ['observatory-open', '#observatory', '#shop-open'],
+  ];
+
+  for (const [openId, screenSel, mustContain] of routes) {
+    walkTo(openId);
+    padA();
+    assert.ok(visible(screenSel), `A on #${openId} should open ${screenSel}`);
+    const focused = env.focusedButton();
+    assert.ok(focused, `${screenSel} should hold pad focus`);
+    assert.ok(focused.closest(screenSel), `pad focus should be inside ${screenSel}, not left behind`);
+    assert.ok($(screenSel).querySelector(mustContain), `${screenSel} should contain ${mustContain}`);
+    padB();
+    assert.ok(visible('#title'), `B should return to the title from ${screenSel}`);
+  }
+  resetInput();
+});
+
+test('every space inside the Observatory is pad-reachable and returns to the hub', () => {
+  resetInput();
+  goToTitle();
+  env.setGamepadAttached(true);
+  env.frames(3);
+
+  walkTo('observatory-open');
+  padA();
+  assert.ok(visible('#observatory'));
+
+  for (const [openId, screenSel] of [['shop-open', '#shop'], ['class-open', '#class-screen'], ['awards-open', '#awards']]) {
+    walkTo(openId);
+    padA();
+    assert.ok(visible(screenSel), `A on #${openId} should open ${screenSel}`);
+    assert.ok(env.focusedButton()?.closest(screenSel), `focus should follow into ${screenSel}`);
+    padB();
+    assert.ok(visible('#observatory'), `B should return ${screenSel} to the hub, not the title`);
+  }
+  resetInput();
+});
+
+test('the pause screen is fully navigable from the pad mid-run', () => {
+  resetInput();
+  game.start(0);
+  env.step(16);
+  env.setGamepadAttached(true);
+  padStep(9);                                   // START
+  assert.equal(game.state, 'paused');
+  env.frames(3);
+
+  const focused = env.focusedButton();
+  assert.ok(focused?.closest('#pause-screen'), 'pad focus belongs to the pause screen');
+
+  // SETTINGS from the pause screen returns to the pause screen, not the title.
+  walkTo('pause-settings');
+  padA();
+  assert.ok(visible('#settings'), 'the pause screen can open settings');
+  padB();
+  assert.ok(visible('#pause-screen'), 'and BACK returns to the pause screen it came from');
+
+  walkTo('resume');
+  padA();
+  assert.equal(game.state, 'play', 'RESUME returns to the run');
+  resetInput();
+});
+
+test('a pad-only player can change a slider — sliders used to be unreachable', () => {
+  resetInput();
+  goToTitle();
+  env.setGamepadAttached(true);
+  env.frames(3);
+
+  walkTo('settings-open');
+  padA();
+  assert.ok(visible('#settings'));
+
+  const slider = walkTo('a11y-damage');
+  assert.equal(slider.type, 'range', 'the damage assist is a slider, and the pad reached it');
+  const before = +slider.value;
+
+  padRight();
+  const after = +slider.value;
+  assert.notEqual(after, before, 'd-pad right on a focused slider should change its value');
+  assert.ok(after > before, 'right should raise it');
+
+  // Left brings it back, and focus never left the slider.
+  padStep(14);
+  assert.equal(+slider.value, before, 'left should lower it again');
+  assert.equal(env.focusedButton()?.id, 'a11y-damage', 'adjusting must not move focus off the slider');
+  resetInput();
+});
+
+test('every control on the settings screen is reachable by cycling', () => {
+  resetInput();
+  goToTitle();
+  env.setGamepadAttached(true);
+  env.frames(3);
+  walkTo('settings-open');
+  padA();
+  assert.ok(visible('#settings'));
+
+  const expected = env.visibleButtons().filter((b) => b.closest('#settings'));
+  assert.ok(expected.length >= 10, 'settings has volume, presentation and assist controls');
+
+  const seen = new Set();
+  for (let i = 0; i < expected.length * 2; i++) {
+    const focused = env.focusedButton();
+    if (focused) seen.add(focused);
+    // Cycling has to use up/down: right is the slider value, not the list.
+    padStep(13);
+  }
+  const missed = expected.filter((el) => !seen.has(el)).map((el) => el.id || el.textContent);
+  assert.deepEqual(missed, [], `these settings controls are unreachable from a pad: ${missed.join(', ')}`);
+  resetInput();
+});
