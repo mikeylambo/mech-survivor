@@ -13,7 +13,19 @@
 // the build on any anchor that matched in more than one place.
 //
 // Run: npm run seam-audit
+import fs from 'node:fs';
 import {PASSES} from './build-pipeline.mjs';
+
+// A rewrite script sitting on disk but absent from the chain applies nothing.
+// pass-f.mjs is in that state: it would install "guaranteed salvage + reward
+// reveal + Garage collection" into meta.js, and the garage that shipped came
+// from public/retention.js instead. Reported, not failed — an orphan is a
+// decision to make, not a broken build.
+function reportOrphanPasses() {
+  const onDisk = fs.readdirSync('.').filter((f) => /^(pass-|post-|prepare-).*\.mjs$/.test(f) && !f.includes('.test.'));
+  const orphans = onDisk.filter((f) => !PASSES.includes(f));
+  if (orphans.length) console.log(`seam-audit: ${orphans.length} rewrite script(s) not in the pipeline and therefore never applied: ${orphans.join(', ')}`);
+}
 
 // Anchors that are ambiguous but provably safe, each with the reason it is
 // safe. Keyed by `pass -> anchor`. Keep this list short and justified.
@@ -89,6 +101,8 @@ for (const pass of PASSES) {
 String.prototype.replace = nativeReplace;
 String.prototype.replaceAll = nativeReplaceAll;
 console.warn = nativeWarn;
+
+reportOrphanPasses();
 
 if (findings.length === 0 && skipped.length === 0) {
   console.log(`\nseam-audit: ${PASSES.length} passes clean — every anchor matched exactly one site, no seam skipped`);

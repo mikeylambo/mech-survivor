@@ -303,3 +303,39 @@ test('after death the pad can reach REDEPLOY', () => {
 
   resetInput();
 });
+
+test('the pad can enter the shop and back out again', () => {
+  resetInput();
+  goToTitle();
+  env.setGamepadAttached(true);
+  env.frames(3);
+
+  // Walk to SHOP and open it.
+  let guard = 0;
+  while (env.focusedButton()?.id !== 'shop-open' && guard++ < 10) {
+    env.gamepad.buttons[15].pressed = true;
+    env.frames(2);
+    env.gamepad.buttons[15].pressed = false;
+    env.frames(2);
+  }
+  assert.equal(env.focusedButton().id, 'shop-open', 'the pad should reach SHOP');
+
+  env.gamepad.buttons[0].pressed = true; // A
+  env.frames(2);
+  env.gamepad.buttons[0].pressed = false;
+  env.frames(3);
+
+  assert.ok(visible('#shop'), 'A should open the shop');
+  assert.ok(!visible('#title'), 'the title screen should yield');
+  const focused = env.focusedButton();
+  assert.ok(focused?.closest('#shop'), 'focus should follow into the shop');
+
+  env.gamepad.buttons[1].pressed = true; // B backs out
+  env.frames(2);
+  env.gamepad.buttons[1].pressed = false;
+  env.frames(3);
+
+  assert.ok(visible('#title'), 'B should back out to the title screen');
+  assert.ok(env.focusedButton()?.closest('#title'), 'focus should come back with it');
+  resetInput();
+});
