@@ -28,4 +28,5 @@ export const PASSES = [
   'pass-w-music.mjs',
   'pass-x-mobile.mjs',
   'pass-y-orbit.mjs',
+  'pass-z-radar.mjs',
 ];
