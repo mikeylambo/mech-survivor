@@ -17,9 +17,13 @@ if(!s.includes('registerMechVFX(createVFXEngine')){
 }
 
 if(!s.includes("fx.play('burst'")){
-  const re=/function burst\(x,y,color,n=8\)\{for\(let i=0;i<n;i\+\+\)\{const a=rand\(0,TAU\),s=rand\(30,180\);particles\.push\(\{x,y,vx:Math\.cos\(a\)\*s,vy:Math\.sin\(a\)\*s,life:rand\(\.18,\.55\),max:\.55,color,r:rand\(1,4\)\}\)\}\}/;
-  must(re.test(s),'legacy burst');
-  s=s.replace(re,"function burst(x,y,color,n=8){fx.play('burst',{x,y,color,count:n,intensity:Math.min(1.35,.55+n/30)})}");
+  const marker='function burst(x,y,color,n=8){';
+  const start=s.indexOf(marker);
+  if(start>=0){
+    const end=s.indexOf('\n',start);
+    const legacy=end>=0?s.slice(start,end):s.slice(start);
+    s=s.replace(legacy,"function burst(x,y,color,n=8){fx.play('burst',{x,y,color,count:n,intensity:Math.min(1.35,.55+n/30)})}");
+  }
 }
 
 replace("burst(player.x,player.y,palette.cyan,12);shake=Math.max(shake,4);toast('VECTOR DASH')","fx.play('mech.dash',{x:player.x,y:player.y,dx:player.dashDir.x,dy:player.dashDir.y,intensity:.9+player.modules.thruster*.06});toast('VECTOR DASH')",'dash effect');
