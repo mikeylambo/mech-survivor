@@ -11,15 +11,15 @@ if(!s.includes("impactPreset(impact,'dash')")){
 if(!s.includes("impactPreset(impact,'level')")){
  const a="function openLevel(bonus=false){";need(a,'level seam');s=s.replace(a,a+"impactPreset(impact,'level');");
 }
-if(!s.includes("impactPreset(impact,e.t==='boss'?'boss-break':e.t==='elite'?'elite-kill':'')")){
+if(!s.includes("impactPreset(impact,e.t==='boss'?'boss-break':'elite-kill')")){
  const a="e.dead=true;player.kills++;";need(a,'kill seam');s=s.replace(a,"e.dead=true;if(e.t==='boss'||e.t==='elite')impactPreset(impact,e.t==='boss'?'boss-break':'elite-kill');player.kills++;");
 }
 if(!s.includes("impactPreset(impact,'boss-break');toast(`COMMANDER // PHASE ${phase}`)")){
  const a="toast(`COMMANDER // PHASE ${phase}`)";need(a,'boss phase seam');s=s.replace(a,"impactPreset(impact,'boss-break');"+a);
 }
 for(const a of ["shake=10;burst(player.x,player.y,palette.red,14)","shake=7;burst(player.x,player.y,palette.red,9)"]){if(s.includes(a))s=s.replace(a,"impactPreset(impact,'player-hit');"+a)}
-if(!s.includes('drawCachedCreature(ctx,e,elapsed,drawArcaneCreature,perf)')){
- const a='for(const e of enemies)drawArcaneCreature(ctx,e,elapsed);';need(a,'creature draw seam');s=s.replace(a,'for(const e of enemies)drawCachedCreature(ctx,e,elapsed,drawArcaneCreature,perf);');
+if(!s.includes('drawCachedCreature(ctx,')){
+ const re=/drawArcaneCreature\(ctx,([A-Za-z_$][\w$]*),elapsed(?:,[^)]*)?\)/g;let count=0;s=s.replace(re,(_,name)=>{count++;return`drawCachedCreature(ctx,${name},elapsed,drawArcaneCreature,perf)`});if(!count)throw new Error('pass-t: missing creature draw seam');
 }
 if(!s.includes('impactTransform(ctx,W,H,impact)')){
  const a='function draw(){ctx.save();';need(a,'draw transform seam');s=s.replace(a,a+'impactTransform(ctx,W,H,impact);');
@@ -31,5 +31,5 @@ if(!s.includes('sampleFrame(perf,realDt*1000,enemies.length)')){
 if(!s.includes('performance:perf')){
  const a='window.mechGame={';need(a,'debug api seam');s=s.replace(a,"window.__mechRuntime={performance:perf,impact};\n"+a);
 }
-for(const [t,l] of [["drawCachedCreature(ctx,e,elapsed",'cached creatures'],['sampleFrame(perf,realDt*1000,enemies.length)','governor'],["impactPreset(impact,'dash')",'dash haptics'],["impactPreset(impact,'boss-break')",'boss impact'],['updateImpact(impact,realDt)','timescale']])need(t,l);
+for(const [t,l] of [['drawCachedCreature(ctx,','cached creatures'],['sampleFrame(perf,realDt*1000,enemies.length)','governor'],["impactPreset(impact,'dash')",'dash haptics'],["impactPreset(impact,'boss-break')",'boss impact'],['updateImpact(impact,realDt)','timescale']])need(t,l);
 fs.writeFileSync(path,s);console.log('pass-t: 60fps covenant + hitstop zoom-punch and haptics integrated');
