@@ -25,4 +25,5 @@ export const PASSES = [
   'pass-t-performance-impact.mjs',
   'pass-u-commander.mjs',
   'pass-v-card-metrics.mjs',
+  'pass-w-music.mjs',
 ];

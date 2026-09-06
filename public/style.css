@@ -34,3 +34,7 @@
 .observatory-spaces .space-name b{color:var(--gold);font-size:15px;letter-spacing:2px}
 .observatory-spaces .space-desc{font:600 12px Rajdhani;letter-spacing:.6px;color:#a9c2d8;text-transform:none}
 @media(max-width:760px){.observatory-spaces{grid-template-columns:1fr;width:100%;gap:8px}.observatory-spaces .space{min-height:0;padding:13px 15px}}
+.settings-list .volumes{display:grid;gap:8px;padding:12px 14px;border:1px solid #2a5c85;background:#06121fcc}
+.settings-list .volumes label{display:grid;grid-template-columns:78px 1fr 36px;gap:10px;align-items:center;font:700 11px Rajdhani;letter-spacing:2px;color:#a9c2d8}
+.settings-list .volumes b{color:var(--cyan);text-align:right;font-size:12px}
+.settings-list .volumes input[type=range]{width:100%;accent-color:#168fff;background:transparent}

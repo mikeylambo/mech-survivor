@@ -59,7 +59,11 @@
     <button class="back-menu">‹ BACK</button>
   </section>
   <section id="settings" class="screen hidden panel-screen">
-    <div class="kicker">SYSTEM CONFIGURATION</div><h2>SETTINGS</h2><div class="settings-list"><button id="toggle-vfx">SCREEN SHAKE <b>ON</b></button><button id="toggle-grid">ARENA GRID <b>ON</b></button><button id="reset-save">RESET SAVE DATA</button></div><button class="back-context">‹ BACK</button>
+    <div class="kicker">SYSTEM CONFIGURATION</div><h2>SETTINGS</h2><div class="settings-list"><div class="volumes">
+      <label>MASTER<input id="vol-master" type="range" min="0" max="100" step="1" value="100"><b id="vol-master-val">100</b></label>
+      <label>MUSIC<input id="vol-music" type="range" min="0" max="100" step="1" value="60"><b id="vol-music-val">60</b></label>
+      <label>EFFECTS<input id="vol-sfx" type="range" min="0" max="100" step="1" value="90"><b id="vol-sfx-val">90</b></label>
+    </div><button id="toggle-vfx">SCREEN SHAKE <b>ON</b></button><button id="toggle-grid">ARENA GRID <b>ON</b></button><button id="reset-save">RESET SAVE DATA</button></div><button class="back-context">‹ BACK</button>
   </section>
   <section id="pause-screen" class="screen hidden panel-screen"><div class="kicker">SORTIE SUSPENDED</div><h2>PAUSED</h2><div class="menu-stack"><button id="resume">RESUME</button><button id="pause-settings">SETTINGS</button><button id="restart">RESTART</button><button id="forfeit">FORFEIT & SAVE</button><button id="quit-menu">MAIN MENU</button></div></section>
   <section id="levelup" class="screen hidden">
