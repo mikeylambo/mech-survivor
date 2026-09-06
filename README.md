@@ -23,6 +23,7 @@ The prototype's player state is a compact genome:
 - Weapons: rail, missiles, drones, orbital blades
 - Materials: white/silver armor, navy structure, cobalt energy, gold accents
 - Scale: module tiers drive visible geometry and weapon output
+- Progression: enemy pickups grant XP toward level-up assembly choices
 
 Every chosen upgrade mutates both combat behavior and the rendered mech silhouette.
 
