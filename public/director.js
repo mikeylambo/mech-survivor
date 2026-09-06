@@ -13,15 +13,15 @@ export const FORMATIONS={
 };
 
 export const OBJECTIVE_ARCHETYPES={
- purge:{id:'purge',label:'PURGE',metric:'kills',baseTarget:18,payout:30,formations:['wedge','ring']},
- hold:{id:'hold',label:'HOLD',metric:'survive',baseTarget:18,payout:28,formations:['ring','cross']},
- intercept:{id:'intercept',label:'INTERCEPT',metric:'kills',baseTarget:12,payout:32,formations:['column','wedge']},
- hunt:{id:'hunt',label:'HUNT',metric:'eliteKills',baseTarget:1,payout:40,formations:['escort','pincer']},
- defend:{id:'defend',label:'DEFEND',metric:'survive',baseTarget:20,payout:34,formations:['ring','pincer']},
- extract:{id:'extract',label:'EXTRACT',metric:'survive',baseTarget:16,payout:34,formations:['column','pincer']},
- seal:{id:'seal',label:'SEAL',metric:'kills',baseTarget:15,payout:36,formations:['cross','ring']},
- escort:{id:'escort',label:'ESCORT',metric:'survive',baseTarget:22,payout:38,formations:['escort','column']},
- anomaly:{id:'anomaly',label:'ANOMALY',metric:'kills',baseTarget:20,payout:45,formations:['cross','escort','ring']}
+ purge:{id:'purge',label:'PURGE',metric:'kills',mechanic:'combat',instruction:'Destroy the marked assault wave.',baseTarget:18,payout:30,formations:['wedge','ring']},
+ hold:{id:'hold',label:'HOLD',metric:'custom',mechanic:'hold',instruction:'Remain inside the command field.',baseTarget:18,payout:32,formations:['ring','cross']},
+ intercept:{id:'intercept',label:'INTERCEPT',metric:'kills',mechanic:'combat',instruction:'Break the incoming column before it surrounds you.',baseTarget:12,payout:32,formations:['column','wedge']},
+ hunt:{id:'hunt',label:'HUNT',metric:'eliteKills',mechanic:'combat',instruction:'Destroy the priority elite.',baseTarget:1,payout:42,formations:['escort','pincer']},
+ defend:{id:'defend',label:'DEFEND',metric:'custom',mechanic:'defend',instruction:'Keep the relay alive by fighting inside its defense radius.',baseTarget:20,payout:38,formations:['ring','pincer']},
+ extract:{id:'extract',label:'EXTRACT',metric:'custom',mechanic:'extract',instruction:'Reach the extraction field and hold position.',baseTarget:10,payout:38,formations:['column','pincer']},
+ seal:{id:'seal',label:'SEAL',metric:'kills',mechanic:'combat',instruction:'Collapse the anomaly guard.',baseTarget:15,payout:36,formations:['cross','ring']},
+ escort:{id:'escort',label:'ESCORT',metric:'custom',mechanic:'escort',instruction:'Stay with the courier until its jump charge completes.',baseTarget:22,payout:42,formations:['escort','column']},
+ anomaly:{id:'anomaly',label:'ANOMALY',metric:'kills',mechanic:'combat',instruction:'Survive the rupture by destroying its manifested hostiles.',baseTarget:20,payout:48,formations:['cross','escort','ring']}
 };
 
 export const DIRECTOR_PHASES=[
@@ -42,8 +42,8 @@ export function createRunDirector({world=0,seed=`sector-${world}`}={}){
  const r=rng(`${seed}:director`);
  const slots=DIRECTOR_SLOTS.map((slot,index)=>{
   const archetype=OBJECTIVE_ARCHETYPES[pick(r,slot.pool)],formation=pick(r,archetype.formations);
-  const target=Math.max(1,Math.round(archetype.baseTarget*(1+world*.12)*(slot.kind==='crisis'?1.35:1)));
-  return{...slot,index,archetypeId:archetype.id,label:archetype.label,metric:archetype.metric,target,payout:Math.round(archetype.payout*(1+world*.18)*(slot.kind==='crisis'?1.4:1)),formation,status:'pending'};
+  const target=Math.max(1,Math.round(archetype.baseTarget*(1+world*.08)*(slot.kind==='crisis'?1.25:1)));
+  return{...slot,index,archetypeId:archetype.id,label:archetype.label,metric:archetype.metric,mechanic:archetype.mechanic,instruction:archetype.instruction,target,payout:Math.round(archetype.payout*(1+world*.18)*(slot.kind==='crisis'?1.4:1)),formation,status:'pending'};
  });
  return{world,seed,slots,cursor:0,active:null,completed:0,failed:0,history:[]};
 }
@@ -59,14 +59,16 @@ export function pollDirector(director,elapsed){
  return slot;
 }
 
-export function updateDirectorEvent(director,{elapsed,kills=0,eliteKills=0}={}){
+export function updateDirectorEvent(director,{elapsed,kills=0,eliteKills=0,customProgress=null,failed=false}={}){
  const e=director?.active;if(!e)return null;
- if(e.metric==='survive')e.progress=Math.max(0,elapsed-e.startedAt);
+ if(failed){e.status='failed';e.failedAt=elapsed;director.failed++;director.history.push({...e});director.active=null;return{type:'failed',event:e}}
+ if(e.metric==='custom'&&Number.isFinite(customProgress))e.progress=customProgress;
+ else if(e.metric==='survive')e.progress=Math.max(0,elapsed-e.startedAt);
  else if(e.metric==='eliteKills')e.progress=eliteKills-(e.startEliteKills||0);
  else e.progress=kills-(e.startKills||0);
  e.progress=clamp(e.progress,0,e.target);
  if(e.progress>=e.target){e.status='complete';e.completedAt=elapsed;director.completed++;director.history.push({...e});director.active=null;return{type:'complete',event:e}}
- const timeout=e.kind==='crisis'?75:60;
+ const timeout=e.kind==='crisis'?82:68;
  if(elapsed-e.startedAt>timeout){e.status='failed';director.failed++;director.history.push({...e});director.active=null;return{type:'failed',event:e}}
  return{type:'progress',event:e};
 }
