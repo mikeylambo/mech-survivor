@@ -46,7 +46,10 @@ replaceFunction('tickRunDirector',`function tickRunDirector(dt=0){
   directorObjective=null;
   setTimeout(()=>{if(state==='play')openLevel(true)},180);
  }else if(result?.type==='failed'){
-  toast('OBJECTIVE LOST // '+result.event.label);directorObjective=null;
+  player.maxHp=Math.max(35,player.maxHp*.95);player.hp=Math.min(player.hp,player.maxHp);
+  spawnFormation('pincer','swarm',1.2);spawnEnemy(false,'elite');
+  fx?.play?.('mech.playerHit',{x:player.x,y:player.y,intensity:.7});audio.cue('warning');toast('OBJECTIVE LOST // FRAME SCAR -5% MAX INTEGRITY');
+  directorObjective=null;
  }
  updateDirectorHud();
 }`);
@@ -58,6 +61,6 @@ if(!s.includes('drawSpatialObjective(ctx,directorObjective')){
  s=s.replace('fx.draw(ctx)','drawSpatialObjective(ctx,directorObjective,director?.active,elapsed,palette);fx.draw(ctx)');
 }
 
-for(const [token,label] of [["createSpatialObjective",'objective import'],['tickRunDirector(dt)','director dt tick'],['customProgress:spatial?.progress','custom objective progress'],['drawSpatialObjective(ctx,directorObjective','objective world rendering'],['openLevel(true)','bonus evolution reward']])requireToken(token,label);
+for(const [token,label] of [["createSpatialObjective",'objective import'],['tickRunDirector(dt)','director dt tick'],['customProgress:spatial?.progress','custom objective progress'],['drawSpatialObjective(ctx,directorObjective','objective world rendering'],['openLevel(true)','bonus evolution reward'],['FRAME SCAR -5% MAX INTEGRITY','failure consequence']])requireToken(token,label);
 fs.writeFileSync(path,s);
-console.log('pass-r: spatial objectives + gameplay rewards integrated');
+console.log('pass-r: spatial objectives + gameplay rewards + failure scars integrated');
