@@ -15,6 +15,7 @@
 // harness.
 import test from 'node:test';
 import assert from 'node:assert/strict';
+import {readFileSync} from 'node:fs';
 import {installBrowserEnvironment} from './test-harness.mjs';
 
 const env = installBrowserEnvironment();
@@ -195,4 +196,23 @@ test('dash is inert outside play state', () => {
   assert.equal(game.frameState().dashTime, 0, 'paused runs must not dash');
   env.keyUp('Space');
   game.resume();
+});
+
+test('the arsenal branch tick is wired into the run loop, not the dash', () => {
+  // The same misplaced anchor that broke the dash also meant evolution branches
+  // never ticked: the hook only runs if it sits inside update(dt). Asserting on
+  // the generated source guards the placement itself, which the behavioural
+  // tests above cannot see once `dt` happens to be in scope.
+  const source = readFileSync(new URL('./public/game.js', import.meta.url), 'utf8');
+  const hooks = [...source.matchAll(/tickBranchIdentity\(player,dt/g)];
+  assert.equal(hooks.length, 1, 'the branch tick should be installed exactly once');
+
+  const updateAt = source.indexOf('function update(dt){');
+  const dashAt = source.indexOf('function tryDash(){');
+  assert.ok(updateAt > -1 && dashAt > -1);
+  assert.ok(hooks[0].index > updateAt, 'branch identities must tick inside update(dt)');
+  assert.ok(
+    !source.slice(dashAt, source.indexOf('\n', dashAt)).includes('tickBranchIdentity'),
+    'the branch tick must not sit in tryDash(), where dt is not in scope',
+  );
 });
