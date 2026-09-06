@@ -1,3 +1,8 @@
+import {runRng} from './run-rng.js';
+// Records are numbered off the run stream, not the clock: the same seed must
+// produce the same salvage ids and the same codex order.
+let _tick=0;
+const runTick=()=>{_tick+=1;return Math.floor(runRng()()*1e6)*1000+_tick};
 import {SALVAGE_FAMILIES,bossForWorld} from './sector-content.js';
 function hashSeed(input){let h=2166136261>>>0;for(const ch of String(input)){h^=ch.charCodeAt(0);h=Math.imul(h,16777619)}return h>>>0}
 function rng(seed){let a=hashSeed(seed)||1;return()=>{a+=0x6D2B79F5;let t=a;t=Math.imul(t^t>>>15,t|1);t^=t+Math.imul(t^t>>>7,t|61);return((t^t>>>14)>>>0)/4294967296}}
@@ -18,12 +23,12 @@ export const SALVAGE_AFFIX_CONTRACTS=[
 const GENERIC_FAMILIES=SALVAGE_FAMILIES.filter(f=>['kinetic','energy','blade','ordnance','autonomous'].includes(f.id));
 function rollRarity(r,{world=0,won=false,objectives=0,corruption=0}={}){const quality=Math.min(18,world*2+(won?4:0)+objectives*2+corruption*5),weights=SALVAGE_RARITIES.map((x,i)=>Math.max(1,x.weight+(i===0?-quality:i*quality/(SALVAGE_RARITIES.length-1))));let n=r()*weights.reduce((a,b)=>a+b,0);for(let i=0;i<weights.length;i++){n-=weights[i];if(n<=0)return SALVAGE_RARITIES[i]}return SALVAGE_RARITIES[0]}
 function familyForDrop(r,summary,won,index){if(won&&index===0)return SALVAGE_FAMILIES.find(f=>f.id===bossForWorld(summary.world)?.rewardFamily)||GENERIC_FAMILIES[0];const primary=summary.primaryConfiguration||'';const weighted=GENERIC_FAMILIES.filter(f=>f.tags.some(tag=>primary.includes(tag)||summary.arsenal?.[tag]?.tier>0));return pick(r,weighted.length?weighted:GENERIC_FAMILIES)}
-export function generateRunSalvage(summary,won=false,seed=Date.now()){
+export function generateRunSalvage(summary,won=false,seed=runTick()){
  const r=rng(`${seed}:${summary.world}:${summary.kills}:${summary.level}:${won}`),objectiveCount=summary.director?.completed||0,count=1+(won&&r()<.5?1:0)+(objectiveCount>=3&&r()<.35?1:0),out=[];
  for(let i=0;i<count;i++){
   const slot=pick(r,SALVAGE_SLOTS),rarity=rollRarity(r,{world:summary.world,won,objectives:objectiveCount,corruption:summary.corruption||0}),affixCount=Math.min(3,1+SALVAGE_RARITIES.findIndex(x=>x.id===rarity.id)),affixes=[],family=familyForDrop(r,summary,won,i);
   while(affixes.length<affixCount){const a=pick(r,SALVAGE_AFFIX_CONTRACTS);if(!affixes.some(x=>x.id===a.id))affixes.push({...a,roll:Math.round((4+r()*8)*(1+summary.world*.14)*(1+SALVAGE_RARITIES.findIndex(x=>x.id===rarity.id)*.25))})}
-  out.push({id:`salvage-${Date.now()}-${i}-${Math.floor(r()*1e7)}`,slot:slot.id,slotLabel:slot.label,rarity:rarity.id,rarityLabel:rarity.label,tier:Math.max(1,summary.world+1),familyKey:family.id,familyName:family.name,familyTags:[...family.tags],affixes,source:{world:summary.world,won,kills:summary.kills,level:summary.level,corruption:summary.corruption||0,director:objectiveCount,boss:won?bossForWorld(summary.world)?.id:null},locked:false,acquiredAt:Date.now()+i});
+  out.push({id:`salvage-${runTick()}-${i}-${Math.floor(r()*1e7)}`,slot:slot.id,slotLabel:slot.label,rarity:rarity.id,rarityLabel:rarity.label,tier:Math.max(1,summary.world+1),familyKey:family.id,familyName:family.name,familyTags:[...family.tags],affixes,source:{world:summary.world,won,kills:summary.kills,level:summary.level,corruption:summary.corruption||0,director:objectiveCount,boss:won?bossForWorld(summary.world)?.id:null},locked:false,acquiredAt:runTick()+i});
  }
  return out;
 }

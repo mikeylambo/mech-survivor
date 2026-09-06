@@ -41,7 +41,7 @@ replaceOnce(
 // The doctrine is resolved here, once, at the moment the commander spawns, and
 // handed to the boss on its own object. boss-runtime never re-reads the build.
 replaceOnce(
-  "spawnEnemy(true);$('#boss-alert').textContent='WARNING // SECTOR COMMANDER';$('#boss-alert').classList.remove('hidden');setTimeout(()=>$('#boss-alert').classList.add('hidden'),2500)",
+  "spawnEnemy(true);$('#boss-alert').textContent='WARNING // ORBIT COMMANDER';$('#boss-alert').classList.remove('hidden');setTimeout(()=>$('#boss-alert').classList.add('hidden'),2500)",
   "spawnEnemy(true);const commander=enemies[enemies.length-1];if(commander&&commander.t==='boss'){commander._doctrine=resolveCommanderDoctrine(player,COMMANDER_DOCTRINE);beginCommanderCeremony(commanderCeremony,{spec:bossForWorld(activeWorld),doctrine:commander._doctrine})}",
   'commander arrival ceremony',
 );

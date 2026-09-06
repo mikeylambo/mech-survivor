@@ -1,7 +1,7 @@
 const clamp=(v,a,b)=>Math.max(a,Math.min(b,v));
 const dist=(a,b)=>Math.hypot(a.x-b.x,a.y-b.y);
 
-export function createSpatialObjective(event,player,{random=Math.random}={}){
+export function createSpatialObjective(event,player,{random=srand}={}){
  if(!event||event.mechanic==='combat')return null;
  const angle=random()*Math.PI*2;
  const distance=event.mechanic==='extract'?420+random()*140:event.mechanic==='escort'?90:220+random()*120;

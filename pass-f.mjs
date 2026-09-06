@@ -24,8 +24,8 @@ replace(
 );
 
 replace(
- "function renderWallets(){document.querySelectorAll('.wallet').forEach(e=>e.textContent=`◈ ${save.coins}`);$('#shop-coins').textContent=save.coins}",
- "function renderWallets(){document.querySelectorAll('.wallet').forEach(e=>e.textContent=`◈ ${save.coins}`);if($('#shop-coins'))$('#shop-coins').textContent=save.coins;if($('#garage-count'))$('#garage-count').textContent=save.salvage.length;if($('#reliquary-count'))$('#reliquary-count').textContent=save.reliquary||0}",
+ "function renderWallets(){document.querySelectorAll('.wallet').forEach(e=>e.textContent=`✦ ${save.coins}`);$('#shop-coins').textContent=save.coins}",
+ "function renderWallets(){document.querySelectorAll('.wallet').forEach(e=>e.textContent=`✦ ${save.coins}`);if($('#shop-coins'))$('#shop-coins').textContent=save.coins;if($('#garage-count'))$('#garage-count').textContent=save.salvage.length;if($('#reliquary-count'))$('#reliquary-count').textContent=save.reliquary||0}",
  'retention wallets'
 );
 
@@ -36,8 +36,8 @@ replace(
 );
 
 replace(
- "function endRun(won,summary){bank(summary,won);if(!won)return;window.mechGame.stop();screen('#clear');$('#clear-grid').innerHTML=`${worlds[summary.world].name.toUpperCase()} · LV ${summary.level} · ${summary.kills} KILLS · ◈ ${summary.coins}`;const next=worlds[summary.world+1];$('#unlock-text').textContent=next?`${next.name.toUpperCase()} UNLOCKED`:'ALL SECTORS CLEARED';$('#next-sector').classList.toggle('hidden',!next);$('#next-sector').onclick=()=>{selectedWorld=summary.world+1;runBanked=false;window.mechGame.start(selectedWorld)}}",
- `function finishRunScreen(won,summary){if(!won){screen('#results');return}window.mechGame.stop();screen('#clear');$('#clear-grid').innerHTML=\`${worlds[summary.world].name.toUpperCase()} · LV \${summary.level} · \${summary.kills} KILLS · ◈ \${summary.coins}\`;const next=worlds[summary.world+1];$('#unlock-text').textContent=next?\`${next.name.toUpperCase()} UNLOCKED\`:'ALL SECTORS CLEARED';$('#next-sector').classList.toggle('hidden',!next);$('#next-sector').onclick=()=>{selectedWorld=summary.world+1;runBanked=false;window.mechGame.start(selectedWorld)}}
+ "function endRun(won,summary){bank(summary,won);if(!won)return;window.mechGame.stop();screen('#clear');$('#clear-grid').innerHTML=`${worlds[summary.world].name.toUpperCase()} · LV ${summary.level} · ${summary.kills} KILLS · ✦ ${summary.coins}`;const next=worlds[summary.world+1];$('#unlock-text').textContent=next?`${next.name.toUpperCase()} UNLOCKED`:'ALL SECTORS CLEARED';$('#next-sector').classList.toggle('hidden',!next);$('#next-sector').onclick=()=>{selectedWorld=summary.world+1;runBanked=false;window.mechGame.start(selectedWorld)}}",
+ `function finishRunScreen(won,summary){if(!won){screen('#results');return}window.mechGame.stop();screen('#clear');$('#clear-grid').innerHTML=\`${worlds[summary.world].name.toUpperCase()} · LV \${summary.level} · \${summary.kills} KILLS · ✦ \${summary.coins}\`;const next=worlds[summary.world+1];$('#unlock-text').textContent=next?\`${next.name.toUpperCase()} UNLOCKED\`:'ALL SECTORS CLEARED';$('#next-sector').classList.toggle('hidden',!next);$('#next-sector').onclick=()=>{selectedWorld=summary.world+1;runBanked=false;window.mechGame.start(selectedWorld)}}
 function showRewardReveal(won,summary,rewards){ensureRetentionUI();const list=$('#reward-items');list.innerHTML=rewards.map((item,i)=>\`<article class="reward-item \${item.rarity}"><div class="tier">SALVAGE // \${item.rarityLabel}</div><h3>\${item.slotLabel}</h3><p>\${salvageSummary(item)}</p><small>\${item.affixes.map(a=>a.label+' +'+a.roll).join(' · ')}</small></article>\`).join('');$('#reward-runline').textContent=\`SECTOR 0\${summary.world+1} · LV \${summary.level} · \${summary.kills} KILLS\`;$('#reward-continue').onclick=()=>finishRunScreen(won,summary);screen('#reward-reveal')}
 function endRun(won,summary){const rewards=bank(summary,won)||pendingRewards;showRewardReveal(won,summary,rewards)}`,
  'reward reveal end run'

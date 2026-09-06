@@ -3,36 +3,52 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width,initial-scale=1,maximum-scale=1,user-scalable=no">
-  <title>MECH SURVIVOR // FRAME ZERO</title>
+  <title>SUNFALL // FIRST LIGHT</title>
   <link rel="stylesheet" href="style.css">
   <link rel="stylesheet" href="shop-state.css">
   <link rel="stylesheet" href="pass-ab.css">
   <link rel="stylesheet" href="mobile-fix.css">
   <link rel="stylesheet" href="commander.css">
+  <link rel="manifest" href="manifest.webmanifest">
+  <meta name="theme-color" content="#020713">
+  <meta name="mobile-web-app-capable" content="yes">
+  <meta name="apple-mobile-web-app-capable" content="yes">
+  <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
 </head>
 <body>
-  <canvas id="game" aria-label="Mech Survivor game arena"></canvas>
+  <canvas id="game" aria-label="Sunfall game arena"></canvas>
   <div id="scanlines"></div>
   <div id="combat-vignette"></div>
   <header id="hud" class="hidden">
-    <div class="brand">FRAME <b>ZERO</b><small>MECH SURVIVOR</small></div>
-    <div class="run-stats"><span id="timer">00:00</span><span id="objective">BOSS 04:00</span><span>LV <b id="level">1</b></span><span><b id="kills">0</b> KILLS</span><span>◈ <b id="run-coins">0</b></span><button id="pause">Ⅱ</button></div>
+    <div class="brand">SUN<b>FALL</b><small>FIRST LIGHT</small></div>
+    <div class="run-stats"><span id="timer">00:00</span><span id="objective">COMMANDER 04:00</span><span>LV <b id="level">1</b></span><span><b id="kills">0</b> KILLS</span><span>✦ <b id="run-coins">0</b></span><button id="pause">Ⅱ</button></div>
     <div class="systems"><label>INTEGRITY</label><div class="bar hp"><i id="hpbar"></i></div><label>XP</label><div class="bar xp"><i id="xpbar"></i></div><label>DASH</label><div class="dash-system"><div class="bar dash"><i id="dashbar"></i></div><b id="dash-label">READY</b></div></div>
   </header>
   <aside id="build" class="hidden"><h3>ASSEMBLY</h3><div id="module-list"></div></aside>
   <section id="title" class="screen">
-    <div class="kicker">SLU RAPID PROTOTYPE // 01</div>
-    <h1>MECH<br><em>SURVIVOR</em></h1>
-    <p>THE RUN BUILDS THE MECH.</p>
-    <div class="menu-stack"><button id="start">PLAY</button><button id="shop-open">SHOP <b class="wallet">◈ 0</b></button><button id="class-open">CLASS <b id="class-label">ROOK</b></button><button id="awards-open">AWARDS</button><button id="creature-lab-open">CREATURE LAB</button><button id="settings-open">SETTINGS</button></div>
+    <div class="kicker">FIRST LIGHT // FIVE ORBITS</div>
+    <h1>SUN<br><em>FALL</em></h1>
+    <p>THE RUN BUILDS THE FRAME.</p>
+    <div class="menu-stack"><button id="start">DESCEND</button><button id="orbit-select">SELECT ORBIT</button><button id="observatory-open">THE OBSERVATORY <b class="wallet">✦ 0</b></button><button id="settings-open">SETTINGS</button></div>
     <div class="controls">MOVE <b>WASD / ARROWS / LEFT STICK</b> · DASH <b>SPACE / SHIFT / B / RB</b> · AUTO-FIRE</div>
   </section>
+  <section id="observatory" class="screen hidden panel-screen">
+    <div class="kicker">EVERYTHING BETWEEN RUNS</div><h2>THE OBSERVATORY</h2>
+    <div class="currency">✦ <b class="wallet">0</b> STARDUST</div>
+    <div class="observatory-spaces">
+      <button id="shop-open" class="space"><span class="space-name">HANGAR</span><span class="space-desc">Spend Stardust on the frame itself.</span></button>
+      <button id="class-open" class="space"><span class="space-name">CHASSIS <b id="class-label">ROOK</b></span><span class="space-desc">Choose the frame you launch in.</span></button>
+      <button id="awards-open" class="space"><span class="space-name">ARCHIVE</span><span class="space-desc">Everything the run recorded.</span></button>
+      <button id="creature-lab-open" class="space"><span class="space-name">BESTIARY</span><span class="space-desc">Specimens recovered from the orbits.</span></button>
+    </div>
+    <button class="back-menu">‹ BACK</button>
+  </section>
   <section id="worlds" class="screen hidden panel-screen">
-    <div class="kicker">EACH SECTOR IS A SEPARATE SORTIE</div><h2>SELECT SECTOR</h2>
+    <div class="kicker">EACH ORBIT IS A SEPARATE DESCENT</div><h2>SELECT ORBIT</h2>
     <div id="world-list" class="world-list"></div><button class="back-menu">‹ BACK</button>
   </section>
   <section id="shop" class="screen hidden panel-screen">
-    <div class="kicker">PERMANENT FRAME POWER</div><h2>HANGAR SHOP</h2><div class="currency">◈ <b id="shop-coins">0</b> SALVAGE</div>
+    <div class="kicker">PERMANENT FRAME POWER</div><h2>HANGAR SHOP</h2><div class="currency">✦ <b id="shop-coins">0</b> STARDUST</div>
     <div id="shop-grid" class="shop-grid"></div><button class="back-menu">‹ BACK</button>
   </section>
   <section id="awards" class="screen hidden panel-screen">
@@ -48,7 +64,23 @@
     <button class="back-menu">‹ BACK</button>
   </section>
   <section id="settings" class="screen hidden panel-screen">
-    <div class="kicker">SYSTEM CONFIGURATION</div><h2>SETTINGS</h2><div class="settings-list"><button id="toggle-vfx">SCREEN SHAKE <b>ON</b></button><button id="toggle-grid">ARENA GRID <b>ON</b></button><button id="reset-save">RESET SAVE DATA</button></div><button class="back-context">‹ BACK</button>
+    <div class="kicker">SYSTEM CONFIGURATION</div><h2>SETTINGS</h2><div class="settings-list"><div class="volumes">
+      <label>MASTER<input id="vol-master" class="pad-slider" type="range" min="0" max="100" step="1" value="100"><b id="vol-master-val">100</b></label>
+      <label>MUSIC<input id="vol-music" class="pad-slider" type="range" min="0" max="100" step="1" value="60"><b id="vol-music-val">60</b></label>
+      <label>EFFECTS<input id="vol-sfx" class="pad-slider" type="range" min="0" max="100" step="1" value="90"><b id="vol-sfx-val">90</b></label>
+    </div>
+    <div class="volumes a11y-group">
+      <div class="group-head">PRESENTATION</div>
+      <label>SCREEN SHAKE<input id="a11y-shake" class="pad-slider" type="range" min="0" max="100" step="10" value="100"><b id="a11y-shake-val">100</b></label>
+      <label>SCREEN FLASH<input id="a11y-flash" class="pad-slider" type="range" min="0" max="100" step="10" value="100"><b id="a11y-flash-val">100</b></label>
+      <label>TEXT SIZE<input id="a11y-text" class="pad-slider" type="range" min="80" max="160" step="10" value="100"><b id="a11y-text-val">100</b></label>
+    </div><button id="a11y-palette">DANGER COLOURS <b>DEFAULT</b></button>
+    <div class="volumes a11y-group assists">
+      <div class="group-head">ASSISTS <span>recorded, never restricted</span></div>
+      <label>DAMAGE TAKEN<input id="a11y-damage" class="pad-slider" type="range" min="25" max="150" step="5" value="100"><b id="a11y-damage-val">100</b></label>
+      <label>GAME SPEED<input id="a11y-speed" class="pad-slider" type="range" min="60" max="120" step="5" value="100"><b id="a11y-speed-val">100</b></label>
+      <div class="assist-record">RECORDED AS <b id="a11y-assist-label">UNASSISTED</b></div>
+    </div><button id="toggle-grid">ARENA GRID <b>ON</b></button><button id="reset-save">RESET SAVE DATA</button></div><button class="back-context">‹ BACK</button>
   </section>
   <section id="pause-screen" class="screen hidden panel-screen"><div class="kicker">SORTIE SUSPENDED</div><h2>PAUSED</h2><div class="menu-stack"><button id="resume">RESUME</button><button id="pause-settings">SETTINGS</button><button id="restart">RESTART</button><button id="forfeit">FORFEIT & SAVE</button><button id="quit-menu">MAIN MENU</button></div></section>
   <section id="levelup" class="screen hidden">
@@ -60,7 +92,7 @@
     <div id="result-grid"></div><div id="final-build"></div>
     <div class="menu-row"><button id="retry">REDEPLOY</button><button id="result-menu">MAIN MENU</button><button id="result-shop">SHOP</button></div>
   </section>
-  <section id="clear" class="screen hidden"><div class="kicker">SECTOR COMMANDER DESTROYED</div><h2>SECTOR CLEAR</h2><div id="clear-grid"></div><p id="unlock-text"></p><div class="menu-row"><button id="next-sector">NEXT SECTOR</button><button id="clear-menu">MAIN MENU</button><button id="clear-shop">SHOP</button></div></section>
+  <section id="clear" class="screen hidden"><div class="kicker">ORBIT COMMANDER DESTROYED</div><h2>ORBIT CLEAR</h2><div id="clear-grid"></div><p id="unlock-text"></p><div class="menu-row"><button id="next-sector">NEXT ORBIT</button><button id="clear-menu">MAIN MENU</button><button id="clear-shop">SHOP</button></div></section>
   <div id="boss-alert" class="hidden">WARNING // HEAVY SIGNATURE</div>
   <div id="touch-controls" aria-hidden="true"><div id="touch-stick"><i></i></div><button id="touch-dash">DASH</button></div>
   <div id="toast"></div>

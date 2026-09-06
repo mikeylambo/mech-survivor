@@ -26,3 +26,52 @@
 }
 @media(max-width:390px){#title h1{font-size:60px}.menu-stack{gap:5px}.menu-stack button{min-height:44px;padding:9px 20px}.run-stats span{font-size:9px}.brand{font-size:17px}.class-card{padding:12px}}
 @media(max-height:700px) and (max-width:760px){#title h1{font-size:56px;margin-bottom:12px}#title>p{margin-bottom:10px}.menu-stack button{min-height:40px;padding:8px 20px}.menu-stack{gap:4px}#touch-stick{width:92px;height:92px}#touch-stick i{left:28px;top:28px;width:36px;height:36px}#touch-dash{width:76px;height:76px}}
+.choice .metrics{display:block;margin:2px 0 6px;font:700 11px Rajdhani;letter-spacing:1.4px;color:var(--cyan);opacity:.92}
+.choice.evolution .metrics{color:#ffe078}
+.observatory-spaces{position:relative;z-index:2;display:grid;grid-template-columns:repeat(2,minmax(240px,320px));gap:12px;margin:18px auto 22px}
+.observatory-spaces .space{display:grid;gap:6px;text-align:left;padding:20px;min-height:110px;align-content:start}
+.observatory-spaces .space-name{font:900 24px 'Barlow Condensed';letter-spacing:3px}
+.observatory-spaces .space-name b{color:var(--gold);font-size:15px;letter-spacing:2px}
+.observatory-spaces .space-desc{font:600 12px Rajdhani;letter-spacing:.6px;color:#a9c2d8;text-transform:none}
+@media(max-width:760px){.observatory-spaces{grid-template-columns:1fr;width:100%;gap:8px}.observatory-spaces .space{min-height:0;padding:13px 15px}}
+.settings-list .volumes{display:grid;gap:8px;padding:12px 14px;border:1px solid #2a5c85;background:#06121fcc}
+.settings-list .volumes label{display:grid;grid-template-columns:78px 1fr 36px;gap:10px;align-items:center;font:700 11px Rajdhani;letter-spacing:2px;color:#a9c2d8}
+.settings-list .volumes b{color:var(--cyan);text-align:right;font-size:12px}
+.settings-list .volumes input[type=range]{width:100%;accent-color:#168fff;background:transparent}
+/* Landscape is a supported fallback, not a failure state: the HUD compresses,
+   the touch controls move inboard, and nothing is cut off. */
+body.landscape #hud{inset:calc(4px + var(--safe-t)) 8px auto;gap:4px 8px}
+body.landscape .systems{width:min(300px,34vw)}
+body.landscape #touch-stick{bottom:max(12px,calc(var(--safe-b) + 8px));width:88px;height:88px}
+body.landscape #touch-stick i{width:34px;height:34px;left:27px;top:27px}
+body.landscape #touch-dash{bottom:max(14px,calc(var(--safe-b) + 10px));width:72px;height:72px}
+body.landscape .screen{justify-content:flex-start;overflow-y:auto}
+body.landscape #commander-card{top:16%}
+
+/* Accessibility.
+   --text-scale is set on <html> by accessibility.js. Font sizes in this sheet
+   are absolute px, so scaling has to be restated rather than inherited: these
+   are the surfaces a player actually reads — HUD labels, build list, toasts,
+   panel copy and the settings themselves. Canvas damage numbers scale in JS,
+   because they are drawn, not styled. */
+:root{--text-scale:1}
+.systems label{font-size:calc(10px * var(--text-scale))}
+#build h3{font-size:calc(11px * var(--text-scale))}
+#toast{font-size:calc(16px * var(--text-scale))}
+.kicker{font-size:calc(12px * var(--text-scale))}
+.shop-card p,.award-card p{font-size:calc(12px * var(--text-scale))}
+.settings-list .volumes label{font-size:calc(11px * var(--text-scale))}
+.settings-list .volumes b{font-size:calc(12px * var(--text-scale))}
+.world-card p{font-size:calc(11px * var(--text-scale))}
+
+/* Presentation reducers also switch off the CSS-driven pulses, so a player who
+   turns shake and flash down does not still get them from the stylesheet. */
+body.reduce-flash #combat-vignette,body.reduce-flash #scanlines{animation:none!important}
+body.reduce-shake .screen,body.reduce-shake #hud{animation:none!important}
+
+.settings-list .a11y-group .group-head{font:700 10px Rajdhani;letter-spacing:3px;color:var(--gold);text-transform:uppercase}
+.settings-list .a11y-group .group-head span{color:#7e93a8;letter-spacing:1.5px;text-transform:none;font-weight:500}
+.settings-list .a11y-group label{grid-template-columns:110px 1fr 38px}
+.settings-list .assists{border-color:#7a5f2a;background:#150f04cc}
+.settings-list .assist-record{font:700 10px Rajdhani;letter-spacing:2px;color:#8fa6bb}
+.settings-list .assist-record b{color:var(--gold);letter-spacing:2px}

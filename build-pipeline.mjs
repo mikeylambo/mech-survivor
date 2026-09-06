@@ -24,4 +24,12 @@ export const PASSES = [
   'pass-s-arsenal-identity.mjs',
   'pass-t-performance-impact.mjs',
   'pass-u-commander.mjs',
+  'pass-v-card-metrics.mjs',
+  'pass-w-music.mjs',
+  'pass-x-mobile.mjs',
+  'pass-y-orbit.mjs',
+  'pass-z-radar.mjs',
+  'pass-aa-alignments.mjs',
+  'pass-ac-determinism.mjs',
+  'pass-ad-accessibility.mjs',
 ];

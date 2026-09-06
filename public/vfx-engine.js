@@ -1,6 +1,7 @@
+import {frand} from './run-rng.js';
 const TAU=Math.PI*2;
 const clamp=(v,a=0,b=1)=>Math.max(a,Math.min(b,v));
-const rand=(a,b)=>a+Math.random()*(b-a);
+const rand=(a,b)=>a+frand()*(b-a);
 const lerp=(a,b,t)=>a+(b-a)*t;
 const ease={linear:t=>t,outQuad:t=>1-(1-t)*(1-t),outCubic:t=>1-(1-t)**3,inQuad:t=>t*t,smooth:t=>t*t*(3-2*t)};
 const value=(v,p,f)=>typeof v==='string'&&v.startsWith('$')?(p[v.slice(1)]??f):(v??f);
@@ -38,7 +39,7 @@ export function createVFXEngine(options={}){
     }
     else if(m.type==='bolt'){
       const x=num(p.x,p,0),y=num(p.y,p,0),x2=p.x2==null?x+num(p.dx,p,1)*num(m.length,p,150):num(p.x2,p,x),y2=p.y2==null?y+num(p.dy,p,0)*num(m.length,p,150):num(p.y2,p,y);
-      active.push({kind:'bolt',x,y,x2,y2,life,max:life,width:num(m.width,p,3),segments:Math.max(3,Math.round(num(m.segments,p,7))),jitter:num(m.jitter,p,14),color:color(m.color,p,'#fff'),alpha:num(m.alpha,p,1),seed:Math.random()*9999});
+      active.push({kind:'bolt',x,y,x2,y2,life,max:life,width:num(m.width,p,3),segments:Math.max(3,Math.round(num(m.segments,p,7))),jitter:num(m.jitter,p,14),color:color(m.color,p,'#fff'),alpha:num(m.alpha,p,1),seed:frand()*9999});
     }
   }
   function update(dt){for(let i=scheduled.length-1;i>=0;i--){const q=scheduled[i];q.time-=dt;if(q.time<=0){spawnModule(q.module,q.params);scheduled.splice(i,1)}}for(const o of active){o.life-=dt;if(o.kind==='particle'){o.x+=o.vx*dt;o.y+=o.vy*dt;o.vy+=o.gravity*dt;const d=Math.exp(-o.drag*dt);o.vx*=d;o.vy*=d}}for(let i=active.length-1;i>=0;i--)if(active[i].life<=0)active.splice(i,1);if(active.length>maxActive)active.splice(0,active.length-maxActive)}

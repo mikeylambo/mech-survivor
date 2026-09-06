@@ -1,5 +1,5 @@
-const B=(id,name,effect,desc,tags=[])=>({id,kind:'blessing',type:'BLESSING',name,effect,desc,tags});
-const C=(id,name,effect,desc,tags=[])=>({id,kind:'corrupted',type:'CORRUPTED BLESSING',name,effect,desc,tags});
+const B=(id,name,effect,desc,tags=[])=>({id,kind:'blessing',type:'ALIGNMENT',name,effect,desc,tags});
+const C=(id,name,effect,desc,tags=[])=>({id,kind:'corrupted',type:'ECLIPSE',name,effect,desc,tags});
 export const BLESSINGS=[
 B('seraphic_conduction','Seraphic Conduction','+18% Damage · +8% Fire Rate','Clean current accelerates every mounted system.',['damage','rate']),
 B('aegis_memory','Aegis Memory','+28 Integrity · +5% Resist','Impact data hardens the frame.',['defense']),
@@ -28,7 +28,7 @@ B('kinetic_mass','Kinetic Mass','+20% Knockback · +10% Projectile Size','Kineti
 B('close_quarters_edict','Close-Quarters Edict','+18% Melee Damage · +10% Dash Rate','The frame commits to proximity violence.',['melee']),
 B('explosive_ordinance','Explosive Ordinance','+16% Explosion Radius','Warheads share optimized detonation geometry.',['explosive']),
 B('autonomous_chorus','Autonomous Chorus','Autonomous weapons +12% rate','Every satellite and drone joins one timing grid.',['autonomous']),
-B('salvager_instinct','Salvager Instinct','+20% Salvage Quality','The frame identifies high-value wreckage in real time.',['salvage']),
+B('salvager_instinct','Stardust Instinct','+20% Stardust Quality','The frame identifies high-value wreckage in real time.',['salvage']),
 B('combat_magnetism','Combat Magnetism','+35 Pickup Range · +15% XP','Recovery fields aggressively pull combat data inward.',['xp']),
 B('critical_mass','Critical Mass','+8% Critical · Crits cause small blast','Precision impacts destabilize nearby targets.',['crit']),
 B('second_wind','Second Wind','Below 35% HP: +18% Move/Fire Rate','Emergency systems unlock under pressure.',['clutch']),
@@ -36,14 +36,14 @@ B('full_output','Full Output','God Window: +25% Damage','Ascendancy protocols re
 B('boss_hunter','Boss Hunter','+20% Damage to Elites/Bosses','Targeting routines identify command signatures.',['boss']),
 B('formation_reader','Formation Reader','+12% Damage during Director events','Structured threats expose predictable geometry.',['director']),
 B('clean_cycle','Clean Cycle','Every 25 kills: heal 3% Integrity','Efficient combat converts momentum into repair.',['regen']),
-B('recovery_protocol','Recovery Protocol','Cache healing +50%','Salvage interfaces route recovered energy directly to armor.',['cache']),
+B('recovery_protocol','Recovery Protocol','Cache healing +50%','Stardust interfaces route recovered energy directly to armor.',['cache']),
 B('vector_patience','Vector Patience','Standing still 1.2s: +18% range','Stability unlocks precision output.',['range']),
 B('moving_target','Moving Target','While moving: +10% evade window','Continuous motion disrupts hostile tracking.',['mobility']),
 B('overlap_theorem','Overlap Theorem','Overlapping zones deal +20% damage','Field systems reward geometric stacking.',['zone']),
 B('execution_dividend','Execution Dividend','Elite kills instantly reduce all cooldowns','Command kills trigger a frame-wide reset pulse.',['elite'])
 ];
 export const CORRUPTED_BLESSINGS=[
-C('blighted_halo','Blighted Halo','+65% Damage · -30% Max Integrity','Weapon output surges as structural purity collapses.',['damage']),
+C('blighted_halo','Eclipsed Halo','+65% Damage · -30% Max Integrity','Weapon output surges as structural purity collapses.',['damage']),
 C('warped_reactor','Warped Reactor','+35% Fire Rate · -12% Resist','The core exceeds safe tolerances.',['rate']),
 C('void_magnet','Void Graviton','+65% XP · -15% Move Speed','A hungry field devours combat data and drags the frame.',['xp']),
 C('fractured_aegis','Fractured Aegis','+22% Resist · -25% Max Integrity','Alien hardening produces brutal efficiency.',['defense']),

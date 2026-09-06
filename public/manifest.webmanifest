@@ -1,0 +1,12 @@
+{
+  "name": "SUNFALL // FIRST LIGHT",
+  "short_name": "SUNFALL",
+  "description": "Five orbits. One frame. The sun is not the sun.",
+  "start_url": "./index.html",
+  "display": "fullscreen",
+  "orientation": "portrait",
+  "background_color": "#020713",
+  "theme_color": "#020713",
+  "categories": ["games"],
+  "icons": []
+}

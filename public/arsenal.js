@@ -1,4 +1,14 @@
 const F=(id,name,category,grammar,hardpoint,niche,tiers,a,b)=>({id,name,category,grammar,hardpoint,niche,tiers,branches:{a:{id:'a',name:a[0],tiers:a.slice(1)},b:{id:'b',name:b[0],tiers:b.slice(1)}}});
+import {cardMetrics} from './arsenal-metrics.js';
+
+/** The state a card produces, without mutating anything. Mirrors applyArsenalCard. */
+export function nextArsenalState(s,card){
+ if(card.stage==='base')return{...s,tier:Math.min(6,s.tier+1)};
+ if(card.stage==='branch')return{...s,branch:card.branch,evo:1};
+ if(card.stage==='evo')return{...s,evo:Math.min(3,s.evo+1)};
+ return{...s};
+}
+
 export const ARSENAL_FAMILIES=[
 F('rail','Rail Cannon','KINETIC','line','forearm','Lane deletion / boss damage',['Install piercing rail.','Increase velocity + damage.','+1 penetration.','Penetrations amplify later hits.','Twin accelerators.','Heavy armor penetration.'],['Siege Rail','Slower, wider heavy rail.','Penetrations stack damage.','HEAVENPIERCER: battlefield shockline.'],['Storm Rail','Paired rail bursts.','Add angled rails.','RAILSTORM ARRAY: rapid lane volleys.']),
 F('repeater','Repeater Cannon','KINETIC','rapid','arm','Reliable single-target DPS',['Install rapid cannon.','Faster cycle.','Occasional double-shot.','Sustained fire accelerates.','Secondary barrel.','Overheat ramps damage.'],['Gatling Array','Extreme fire rate.','Additional barrels acquire targets.','METAL TEMPEST: continuous kinetic storm.'],['Heavy Repeater','Slower, larger rounds.','Heavy shots stagger.','THUNDER CANNON: explosive burst finisher.']),
@@ -35,7 +45,17 @@ export const ARSENAL_BY_ID=Object.fromEntries(ARSENAL_FAMILIES.map(x=>[x.id,x]))
 export function createInitialArsenal(classId='rook'){const a={};for(const f of ARSENAL_FAMILIES)a[f.id]={tier:0,branch:null,evo:0};const starter=classId==='lancer'?'slash':classId==='bulwark'?'barrier':'repeater';a[starter].tier=1;return a}
 export function familyPower(s){return !s?0:s.tier+(s.evo||0)*1.5}
 export function effectText(f,s,branch=null){if(branch){const b=f.branches[branch];return b?.tiers[Math.max(0,(s?.evo||0))]||b?.tiers[0]||'Transform weapon behavior.'}const n=Math.min(5,s?.tier||0);return f.tiers[n]||f.tiers.at(-1)}
-export function arsenalCardsFor(player){const out=[];for(const f of ARSENAL_FAMILIES){const s=player.arsenal?.[f.id]||{tier:0,branch:null,evo:0};if(s.tier<6&&!s.branch)out.push({id:'wf:'+f.id,kind:'arsenal',family:f.id,type:f.category,name:f.name,effect:f.tiers[s.tier],desc:f.grammar.toUpperCase()+' // '+f.niche,stage:'base'});else if(s.tier>=6&&!s.branch){for(const k of['a','b']){const b=f.branches[k];out.push({id:'wb:'+f.id+':'+k,kind:'arsenal',family:f.id,branch:k,type:'EVOLUTION',name:b.name,effect:b.tiers[0],desc:'Transform '+f.name+' into '+b.name+'.',stage:'branch'})}}else if(s.branch&&s.evo<3){const b=f.branches[s.branch];out.push({id:'we:'+f.id+':'+s.branch,kind:'arsenal',family:f.id,branch:s.branch,type:'EVOLVED '+f.category,name:b.name,effect:b.tiers[s.evo],desc:f.name+' // '+b.name,stage:'evo'})}}return out}
+/**
+ * Every card carries a structured `metrics` object read from the same formulas
+ * arsenal-runtime.js runs on. A card that changes no declared scalar is marked
+ * behaviorOnly rather than being given an invented number.
+ */
+function withMetrics(card,current,player){
+ const next=nextArsenalState(current,card);
+ const metrics=cardMetrics(card.family,current,next,player);
+ return{...card,metrics,behaviorOnly:metrics.behaviorOnly,metricLine:metrics.line};
+}
+export function arsenalCardsFor(player){const out=[];for(const f of ARSENAL_FAMILIES){const s=player.arsenal?.[f.id]||{tier:0,branch:null,evo:0};if(s.tier<6&&!s.branch)out.push(withMetrics({id:'wf:'+f.id,kind:'arsenal',family:f.id,type:f.category,name:f.name,effect:f.tiers[s.tier],desc:f.grammar.toUpperCase()+' // '+f.niche,stage:'base'},s,player));else if(s.tier>=6&&!s.branch){for(const k of['a','b']){const b=f.branches[k];out.push(withMetrics({id:'wb:'+f.id+':'+k,kind:'arsenal',family:f.id,branch:k,type:'EVOLUTION',name:b.name,effect:b.tiers[0],desc:'Transform '+f.name+' into '+b.name+'.',stage:'branch'},s,player))}}else if(s.branch&&s.evo<3){const b=f.branches[s.branch];out.push(withMetrics({id:'we:'+f.id+':'+s.branch,kind:'arsenal',family:f.id,branch:s.branch,type:'EVOLVED '+f.category,name:b.name,effect:b.tiers[s.evo],desc:f.name+' // '+b.name,stage:'evo'},s,player))}}return out}
 export function applyArsenalCard(player,card){const s=player.arsenal[card.family];if(card.stage==='base')s.tier=Math.min(6,s.tier+1);else if(card.stage==='branch'){s.branch=card.branch;s.evo=1}else if(card.stage==='evo')s.evo=Math.min(3,s.evo+1);return s}
 export function arsenalTierLabel(player,card){const s=player.arsenal[card.family];if(card.stage==='branch')return 'BRANCH EVOLUTION';if(card.stage==='evo')return 'EVOLUTION '+(s.evo+1)+' → '+Math.min(3,s.evo+1);return s.tier===0?'NEW ASSEMBLY':s.tier===5?'FINAL BASE TIER':'TIER '+s.tier+' → '+(s.tier+1)}
 export function arsenalBuildLines(player){return ARSENAL_FAMILIES.filter(f=>(player.arsenal?.[f.id]?.tier||0)>0).map(f=>{const s=player.arsenal[f.id];const branch=s.branch?' // '+f.branches[s.branch].name.toUpperCase()+' E'+s.evo:'';return f.name.toUpperCase()+' T'+s.tier+branch})}

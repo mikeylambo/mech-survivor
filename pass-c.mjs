@@ -42,8 +42,8 @@ replace(
 );
 
 replace(
-  "`BOSS ${format(Math.max(0,RUN_DURATION-elapsed))}`",
-  "`BOSS ${format(Math.max(0,BOSS_TIME-elapsed))}`",
+  "`COMMANDER ${format(Math.max(0,RUN_DURATION-elapsed))}`",
+  "`COMMANDER ${format(Math.max(0,BOSS_TIME-elapsed))}`",
   'boss hud timing'
 );
 
@@ -82,7 +82,7 @@ replace(
 
 replace(
   "if(!finalBossSpawned&&elapsed>=BOSS_TIME){finalBossSpawned=true;bossIndex=activeWorld+1;spawnEnemy(true);$('#boss-alert').classList.remove('hidden');",
-  "if(!finalBossSpawned&&elapsed>=BOSS_TIME){finalBossSpawned=true;bossIndex=activeWorld+1;audio.cue('boss');spawnEnemy(true);$('#boss-alert').textContent='WARNING // SECTOR COMMANDER';$('#boss-alert').classList.remove('hidden');",
+  "if(!finalBossSpawned&&elapsed>=BOSS_TIME){finalBossSpawned=true;bossIndex=activeWorld+1;audio.cue('boss');spawnEnemy(true);$('#boss-alert').textContent='WARNING // ORBIT COMMANDER';$('#boss-alert').classList.remove('hidden');",
   'boss warning audio'
 );
 
