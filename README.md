@@ -10,6 +10,33 @@ npm run dev
 
 Open `http://localhost:4173`. `npm run build` runs the deploy gate used by Vercel.
 
+## Build layout
+
+`npm run build` is a chain of string-rewrite passes (`prepare-build.mjs`, then
+`pass-*.mjs`) that patch five files in place. Those five files are authored in
+`src/` and the build copies them into `public/` before patching:
+
+| authored | generated |
+| --- | --- |
+| `src/game.js` | `public/game.js` |
+| `src/meta.js` | `public/meta.js` |
+| `src/retention.js` | `public/retention.js` |
+| `src/celestial-frame.js` | `public/celestial-frame.js` |
+| `src/arsenal-runtime.js` | `public/arsenal-runtime.js` |
+
+**Edit `src/`, never the five generated files in `public/`** — they are
+git-ignored and overwritten on every build. Every other file in `public/` is a
+hand-written source served as-is.
+
+Restoring from `src/` first is what makes the build repeatable: the passes anchor
+on exact source text, so re-patching already-patched output fails. Because the
+generated files are not committed, the deployed bundle can no longer drift from
+the build output.
+
+`npm run seam-audit` re-runs the pass chain and reports any pass whose anchor
+text matches in more than one place — the failure mode that once injected the
+dash hook into the wrong function.
+
 Controls: WASD, arrow keys, or the left gamepad stick. Dash with Space/Shift or gamepad B/RB. Weapons fire automatically. Level-up choices support mouse/touch or number keys 1–3. Open the in-game VFX Lab with F8 (fn + F8 on Mac media-key layouts) or Command + Shift + V.
 
 ## Mech Genome

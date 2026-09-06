@@ -25,7 +25,9 @@ if(!s.includes("fx.play('burst'")){
   }
 }
 
-replace("burst(player.x,player.y,palette.cyan,12);shake=Math.max(shake,4);toast('VECTOR DASH')","fx.play('mech.dash',{x:player.x,y:player.y,dx:player.dashDir.x,dy:player.dashDir.y,intensity:.9+player.modules.thruster*.06});toast('VECTOR DASH')",'dash effect');
+// Anchored on the particle+shake pair only: pass-c inserts audio.cue('dash')
+// after it, and the cue must survive the swap to the VFX recipe.
+replace("burst(player.x,player.y,palette.cyan,12);shake=Math.max(shake,4);","fx.play('mech.dash',{x:player.x,y:player.y,dx:player.dashDir.x,dy:player.dashDir.y,intensity:.9+player.modules.thruster*.06});",'dash effect');
 
 if(!s.includes("fx.play('mech.muzzle'")){
   const from="burst(player.x+Math.cos(a)*26,player.y+Math.sin(a)*26,palette.cyan,3)}";

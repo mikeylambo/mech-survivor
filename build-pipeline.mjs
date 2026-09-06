@@ -1,0 +1,26 @@
+// The ordered pass chain, in one place, so the build and the seam audit can
+// never drift apart.
+export const PASSES = [
+  'prepare-build.mjs',
+  'pass-ab.mjs',
+  'post-fix.mjs',
+  'pass-c.mjs',
+  'pass-d.mjs',
+  'post-d-fix.mjs',
+  'pass-e.mjs',
+  'pass-g.mjs',
+  'post-g-fix.mjs',
+  'pass-h.mjs',
+  'pass-i.mjs',
+  'pass-j.mjs',
+  'pass-k.mjs',
+  'pass-l.mjs',
+  'pass-m.mjs',
+  'pass-n.mjs',
+  'pass-o.mjs',
+  'pass-p.mjs',
+  'pass-q-vfx.mjs',
+  'pass-r-gameplay-depth.mjs',
+  'pass-s-arsenal-identity.mjs',
+  'pass-t-performance-impact.mjs',
+];

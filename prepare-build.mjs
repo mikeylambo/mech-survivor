@@ -1,4 +1,9 @@
 import fs from 'node:fs';
+import {restoreGeneratedSources} from './build-sources.mjs';
+
+// Every build starts from the pristine src/ copies so the pass chain always
+// patches the same bytes and `npm run build` is repeatable.
+restoreGeneratedSources();
 
 const path='public/game.js';
 let s=fs.readFileSync(path,'utf8');
