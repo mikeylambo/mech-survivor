@@ -27,4 +27,5 @@ export const PASSES = [
   'pass-v-card-metrics.mjs',
   'pass-w-music.mjs',
   'pass-x-mobile.mjs',
+  'pass-y-orbit.mjs',
 ];
