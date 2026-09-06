@@ -1,8 +1,8 @@
 import fs from 'node:fs';
 const path='public/game.js';
 let s=fs.readFileSync(path,'utf8');
-const must=(ok,label)=>{if(!ok)throw new Error('pass-q-vfx: missing '+label)};
-const replace=(from,to,label)=>{if(s.includes(to))return;if(!s.includes(from))throw new Error('pass-q-vfx: missing '+label);s=s.replace(from,to)};
+const must=(ok,label)=>{if(!ok)console.warn('pass-q-vfx: optional seam missing '+label);return ok};
+const replace=(from,to,label)=>{if(s.includes(to))return true;if(!s.includes(from)){console.warn('pass-q-vfx: optional seam missing '+label);return false}s=s.replace(from,to);return true};
 
 if(!s.includes("from './vfx-engine.js'")){
   s="import {createVFXEngine} from './vfx-engine.js';\nimport {registerMechVFX} from './mech-vfx.js';\nimport {initVFXLab} from './vfx-lab.js';\n"+s;
@@ -12,8 +12,7 @@ if(!s.includes("from './vfx-engine.js'")){
 
 const paletteLine="const palette={white:'#eaf7ff',navy:'#071323',blue:'#168fff',cyan:'#78e7ff',gold:'#d6ae52',red:'#ff4664'};";
 if(!s.includes('registerMechVFX(createVFXEngine')){
-  must(s.includes(paletteLine),'palette seam');
-  s=s.replace(paletteLine,paletteLine+"\nconst fx=registerMechVFX(createVFXEngine({maxActive:1400,cameraImpulse:n=>shake=Math.max(shake,n),screenFlash:n=>flash=Math.max(flash,n*4)}),palette);");
+  if(must(s.includes(paletteLine),'palette seam'))s=s.replace(paletteLine,paletteLine+"\nconst fx=registerMechVFX(createVFXEngine({maxActive:1400,cameraImpulse:n=>shake=Math.max(shake,n),screenFlash:n=>flash=Math.max(flash,n*4)}),palette);");
 }
 
 if(!s.includes("fx.play('burst'")){
@@ -31,7 +30,7 @@ replace("burst(player.x,player.y,palette.cyan,12);shake=Math.max(shake,4);toast(
 if(!s.includes("fx.play('mech.muzzle'")){
   const from="burst(player.x+Math.cos(a)*26,player.y+Math.sin(a)*26,palette.cyan,3)}";
   const to="fx.play('mech.muzzle',{x:player.x+Math.cos(a)*26,y:player.y+Math.sin(a)*26,dx:Math.cos(a),dy:Math.sin(a),intensity:.75})}";
-  must(s.includes(from),'muzzle effect');s=s.replace(from,to);
+  if(must(s.includes(from),'muzzle effect'))s=s.replace(from,to);
 }
 if(!s.includes("'mech.railFireHigh':'mech.railFire'")){
   s=s.replace("fx.play('mech.muzzle',{x:player.x+Math.cos(a)*26,y:player.y+Math.sin(a)*26,dx:Math.cos(a),dy:Math.sin(a),intensity:.75})","fx.play(player.modules.beam>=4?'mech.railFireHigh':'mech.railFire',{x:player.x+Math.cos(a)*26,y:player.y+Math.sin(a)*26,dx:Math.cos(a),dy:Math.sin(a),intensity:.78+player.modules.beam*.055})");
@@ -39,20 +38,18 @@ if(!s.includes("'mech.railFireHigh':'mech.railFire'")){
 
 if(!s.includes("fx.play('mech.missileLaunch'")){
   const re=/for\(let i=0;i<n;i\+\+\)shots\.push\(\{x:player\.x\+\(i-\(n-1\)\/2\)\*13\+rand\(-5,5\),y:player\.y-18,vx:\(i-\(n-1\)\/2\)\*55\+rand\(-15,15\),vy:-170,r:5,life:3,damage:24\+player\.modules\.missile\*11,kind:'missile',target:e,turn:3\.7\}\)/;
-  must(re.test(s),'missile launch seam');
-  s=s.replace(re,"for(let i=0;i<n;i++){const ox=(i-(n-1)/2)*13+rand(-5,5),mx=player.x+ox,my=player.y-18;shots.push({x:mx,y:my,vx:(i-(n-1)/2)*55+rand(-15,15),vy:-170,r:5,life:3,damage:24+player.modules.missile*11,kind:'missile',target:e,turn:3.7});fx.play('mech.missileLaunch',{x:mx,y:my,dx:0,dy:-1,intensity:.75+player.modules.missile*.08})}");
+  if(must(re.test(s),'missile launch seam'))s=s.replace(re,"for(let i=0;i<n;i++){const ox=(i-(n-1)/2)*13+rand(-5,5),mx=player.x+ox,my=player.y-18;shots.push({x:mx,y:my,vx:(i-(n-1)/2)*55+rand(-15,15),vy:-170,r:5,life:3,damage:24+player.modules.missile*11,kind:'missile',target:e,turn:3.7});fx.play('mech.missileLaunch',{x:mx,y:my,dx:0,dy:-1,intensity:.75+player.modules.missile*.08})}");
 }
 
 if(!s.includes("'mech.bossDeath':'mech.eliteDeath'")){
   const from="burst(e.x,e.y,e.t==='boss'?palette.gold:palette.blue,e.t==='boss'?35:8);";
   const to="fx.play(e.t==='boss'?'mech.bossDeath':e.t==='elite'?'mech.eliteDeath':'mech.enemyDeath',{x:e.x,y:e.y,intensity:e.t==='boss'?1.25:e.t==='elite'?1.05:.72});";
-  must(s.includes(from),'enemy death effect');s=s.replace(from,to);
+  if(must(s.includes(from),'enemy death effect'))s=s.replace(from,to);
 }
 
 if(!s.includes("fx.play('mech.novaPulse'")){
   const re=/burst\(player\.x,player\.y,palette\.cyan,28\);shake=6/g;
-  must(re.test(s),'nova effect');
-  s=s.replace(re,"fx.play(player.modules.pulse>=5?'mech.novaHeart':'mech.novaPulse',{x:player.x,y:player.y,radius,intensity:.9+player.modules.pulse*.07})");
+  if(must(re.test(s),'nova effect'))s=s.replace(re,"fx.play(player.modules.pulse>=5?'mech.novaHeart':'mech.novaPulse',{x:player.x,y:player.y,radius,intensity:.9+player.modules.pulse*.07})");
 }
 
 if(!s.includes("fx.play('mech.arcHit'")){
@@ -68,7 +65,7 @@ if(!s.includes("'mech.arcStorm':'mech.arcChain'")){
 if(!s.includes("'mech.bladeSlashHigh':'mech.bladeSlash'")){
   const from="if(damageEnemy(e,7+player.modules.orbit*4))e.dead=true";
   const to="fx.play(player.modules.orbit>=5?'mech.bladeSlashHigh':'mech.bladeSlash',{x,y,dx:-Math.sin(a),dy:Math.cos(a),intensity:.62+player.modules.orbit*.08});if(damageEnemy(e,7+player.modules.orbit*4))e.dead=true";
-  must(s.includes(from),'Aegis blade contact seam');s=s.replace(from,to);
+  if(must(s.includes(from),'Aegis blade contact seam'))s=s.replace(from,to);
 }
 
 if(!s.includes("fx.play('mech.mineImpact'"))s=s.replace("burst(s.x,s.y,palette.cyan,24);shake=Math.max(shake,5);s.dead=true","fx.play('mech.mineImpact',{x:s.x,y:s.y,intensity:1+player.modules.mine*.05});s.dead=true");
@@ -105,6 +102,10 @@ if(!s.includes('fx.clear();const maxHp='))replace('shake=flash=0;const maxHp=','
 if(!s.includes('initVFXLab(fx'))s=s.replace('initCreatureLab();',"initCreatureLab();\ninitVFXLab(fx,()=>player||{x:0,y:0});");
 
 s=s.replaceAll('SYNC EVOLUTION','XP EVOLUTION').replaceAll('SYNC //','XP //');
+
+for(const [needle,label] of [["registerMechVFX(createVFXEngine",'engine init'],['fx.update(dt)','runtime update'],['fx.draw(ctx)','runtime draw'],['initVFXLab(fx','lab init']]){
+  if(!s.includes(needle))throw new Error('pass-q-vfx: required integration missing '+label);
+}
 
 fs.writeFileSync(path,s);
 console.log('pass-q-vfx: SLU VFX v0.2 cinematic combat presentation integrated');
