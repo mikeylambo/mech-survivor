@@ -84,8 +84,8 @@ replaceOnce(
 );
 
 replaceOnce(
-  'camZoom=mobileCamera?1.18:1,',
-  'camZoom=(mobileCamera?1.18:1)*commanderCam,',
+  'camZoom=mobileCamera?0.88:1,',
+  'camZoom=(mobileCamera?0.88:1)*commanderCam,',
   'commander camera pull-back',
 );
 

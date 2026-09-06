@@ -7,7 +7,14 @@ if(!s.includes('stick.y+(keys.has')){
 }
 if(!s.includes('const mobileCamera=W<760')){
  const from='ctx.translate(W/2-player.x,H/2-player.y);';
- const to="const mobileCamera=W<760,camZoom=mobileCamera?1.18:1,camY=mobileCamera?H*.46:H/2;ctx.translate(W/2,camY);ctx.scale(camZoom,camZoom);ctx.translate(-player.x,-player.y);";
+ // Mobile zooms OUT, not in. It used to be 1.18 — an 18% zoom IN on the
+ // platform with the least screen to spare, which is backwards for a
+ // horde survivor: the whole read of the game is peripheral, and a phone
+ // already sees less of the field than a desktop does. Below 1 the phone
+ // gets a WIDER field of view than desktop, which is what the reference
+ // games do. The tradeoff to watch when tuning is sprite and HUD
+ // legibility at the wider view; 0.88 is the starting point, tuned live.
+ const to="const mobileCamera=W<760,camZoom=mobileCamera?0.88:1,camY=mobileCamera?H*.46:H/2;ctx.translate(W/2,camY);ctx.scale(camZoom,camZoom);ctx.translate(-player.x,-player.y);";
  must(s.includes(from),'camera transform seam');s=s.replace(from,to);
 }
 if(!s.includes("class=\"choice-copy\"")){

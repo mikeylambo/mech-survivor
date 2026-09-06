@@ -149,3 +149,19 @@ test('a run survives without ever dashing', () => {
   assert.equal(game.frameState()?.dashCooldown, 0, 'the dash was never spent');
   assert.ok(survived > 900, `a no-dash run only lasted ${survived} frames`);
 });
+
+test('the phone gets a WIDER field of view than desktop, not a narrower one', () => {
+  // This shipped backwards: mobile zoomed IN 18%, on the platform with the
+  // least screen to spare. A horde survivor is read peripherally — what is
+  // about to reach you matters more than what is already on top of you — so
+  // the smaller screen has to compensate by showing more of the field, not
+  // less. The direction is what this locks; the exact value is a tuning knob.
+  const src = fs.readFileSync(new URL('./public/game.js', import.meta.url), 'utf8');
+  const match = src.match(/const mobileCamera=W<760,camZoom=\(?mobileCamera\?([0-9.]+):1\)?/);
+  assert.ok(match, 'the mobile camera zoom should still be one readable expression');
+
+  const zoom = Number(match[1]);
+  assert.ok(zoom < 1, `mobile must zoom out, not in — found ${zoom}`);
+  // A floor as well as a ceiling: past this the mech and the HUD stop reading.
+  assert.ok(zoom >= 0.8, `${zoom} is too wide to keep sprites and HUD legible`);
+});
