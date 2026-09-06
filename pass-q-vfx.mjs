@@ -97,7 +97,10 @@ if(!s.includes("fx.play('mech.playerHit'")){
 }
 
 if(!s.includes('fx.update(dt);updateHUD()'))replace('shake*=Math.pow(.02,dt);flash*=Math.pow(.005,dt);updateHUD()','shake*=Math.pow(.02,dt);flash*=Math.pow(.005,dt);fx.update(dt);updateHUD()','VFX update');
-if(!s.includes('drawMech();fx.draw(ctx);'))replace('drawMech();for(const p of particles)','drawMech();fx.draw(ctx);for(const p of particles)','VFX draw');
+if(!s.includes('fx.draw(ctx)')){
+  if(s.includes('drawMech();'))s=s.replace('drawMech();','drawMech();fx.draw(ctx);');
+  else replace('ctx.restore()}','fx.draw(ctx);ctx.restore()}','VFX draw fallback');
+}
 if(!s.includes('fx.clear();const maxHp='))replace('shake=flash=0;const maxHp=','shake=flash=0;fx.clear();const maxHp=','VFX reset');
 if(!s.includes('initVFXLab(fx'))s=s.replace('initCreatureLab();',"initCreatureLab();\ninitVFXLab(fx,()=>player||{x:0,y:0});");
 
