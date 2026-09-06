@@ -86,7 +86,7 @@ if(!s.includes("fx.play('mech.levelUp'")){
 }
 if(!s.includes("fx.play('mech.synergy'")){
   const from="burst(player.x,player.y,palette.gold,45);shake=10;toast(`SYNC EVOLUTION // ${s.name}`)";
-  const to="fx.play('mech.synergy',{x:player.x,y:player.y,intensity:1.2});toast(`SYNC EVOLUTION // ${s.name}`)";
+  const to="fx.play('mech.synergy',{x:player.x,y:player.y,intensity:1.2});toast(`XP EVOLUTION // ${s.name}`)";
   if(s.includes(from))s=s.replace(from,to);
 }
 
@@ -99,6 +99,8 @@ if(!s.includes('fx.update(dt);updateHUD()'))replace('shake*=Math.pow(.02,dt);fla
 if(!s.includes('drawMech();fx.draw(ctx);'))replace('drawMech();for(const p of particles)','drawMech();fx.draw(ctx);for(const p of particles)','VFX draw');
 if(!s.includes('fx.clear();const maxHp='))replace('shake=flash=0;const maxHp=','shake=flash=0;fx.clear();const maxHp=','VFX reset');
 if(!s.includes('initVFXLab(fx'))s=s.replace('initCreatureLab();',"initCreatureLab();\ninitVFXLab(fx,()=>player||{x:0,y:0});");
+
+s=s.replaceAll('SYNC EVOLUTION','XP EVOLUTION').replaceAll('SYNC //','XP //');
 
 fs.writeFileSync(path,s);
 console.log('pass-q-vfx: SLU VFX v0.2 cinematic combat presentation integrated');
