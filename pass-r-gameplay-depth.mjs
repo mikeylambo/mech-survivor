@@ -19,7 +19,7 @@ replaceFunction('updateDirectorHud',`function updateDirectorHud(){
  box.classList.remove('hidden');box.classList.toggle('crisis',e.kind==='crisis');
  document.querySelector('#director-title').textContent=(e.kind==='crisis'?'CRISIS':'OPPORTUNITY')+' // '+e.label;
  const spatial=directorObjective?.status?(' · '+directorObjective.status):'';
- document.querySelector('#director-progress').textContent=Math.floor(e.progress||0)+' / '+e.target+' · PAYOUT ◈ '+e.payout+spatial;
+ document.querySelector('#director-progress').textContent=Math.floor(e.progress||0)+' / '+e.target+' · PAYOUT ✦ '+e.payout+spatial;
  box.title=e.instruction||'';
 }`);
 

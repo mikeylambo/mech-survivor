@@ -68,8 +68,8 @@ export function beginCommanderCeremony(ceremony, {spec, doctrine}) {
   const card = cardElement();
   card.className = first ? 'first' : 'known';
   card.innerHTML = first
-    ? `<span class="rank">SECTOR COMMANDER</span><h2>${spec.name}</h2><span class="doctrine">${doctrineLabel(doctrine)}</span><span class="hint">ANY INPUT TO SKIP</span>`
-    : `<span class="rank">SECTOR COMMANDER</span><h2>${spec.name}</h2><span class="doctrine">${doctrineLabel(doctrine)}</span>`;
+    ? `<span class="rank">ORBIT COMMANDER</span><h2>${spec.name}</h2><span class="doctrine">${doctrineLabel(doctrine)}</span><span class="hint">ANY INPUT TO SKIP</span>`
+    : `<span class="rank">ORBIT COMMANDER</span><h2>${spec.name}</h2><span class="doctrine">${doctrineLabel(doctrine)}</span>`;
   card.classList.add('showing');
 
   document.body.classList.add('commander-present');

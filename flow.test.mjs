@@ -304,38 +304,53 @@ test('after death the pad can reach REDEPLOY', () => {
   resetInput();
 });
 
-test('the pad can enter the shop and back out again', () => {
+test('the pad can reach a space inside the Observatory and back out to it', () => {
   resetInput();
   goToTitle();
   env.setGamepadAttached(true);
   env.frames(3);
 
-  // Walk to SHOP and open it.
-  let guard = 0;
-  while (env.focusedButton()?.id !== 'shop-open' && guard++ < 10) {
-    env.gamepad.buttons[15].pressed = true;
+  const walkTo = (id, limit = 10) => {
+    for (let i = 0; i < limit && env.focusedButton()?.id !== id; i++) {
+      env.gamepad.buttons[15].pressed = true;
+      env.frames(2);
+      env.gamepad.buttons[15].pressed = false;
+      env.frames(2);
+    }
+    assert.equal(env.focusedButton()?.id, id, `the pad should reach #${id}`);
+  };
+  const pressA = () => {
+    env.gamepad.buttons[0].pressed = true;
     env.frames(2);
-    env.gamepad.buttons[15].pressed = false;
-    env.frames(2);
-  }
-  assert.equal(env.focusedButton().id, 'shop-open', 'the pad should reach SHOP');
+    env.gamepad.buttons[0].pressed = false;
+    env.frames(3);
+  };
 
-  env.gamepad.buttons[0].pressed = true; // A
-  env.frames(2);
-  env.gamepad.buttons[0].pressed = false;
-  env.frames(3);
+  // Title -> the hub.
+  walkTo('observatory-open');
+  pressA();
+  assert.ok(visible('#observatory'), 'A should open the Observatory');
+  assert.ok(!visible('#title'), 'the title screen yields to the hub');
 
-  assert.ok(visible('#shop'), 'A should open the shop');
-  assert.ok(!visible('#title'), 'the title screen should yield');
-  const focused = env.focusedButton();
-  assert.ok(focused?.closest('#shop'), 'focus should follow into the shop');
+  // Hub -> the Hangar, one of its four spaces.
+  walkTo('shop-open');
+  pressA();
+  assert.ok(visible('#shop'), 'A should open the Hangar');
+  assert.ok(env.focusedButton()?.closest('#shop'), 'focus should follow into the Hangar');
 
-  env.gamepad.buttons[1].pressed = true; // B backs out
+  // BACK returns to the hub it was opened from, not the title.
+  env.gamepad.buttons[1].pressed = true;
   env.frames(2);
   env.gamepad.buttons[1].pressed = false;
   env.frames(3);
+  assert.ok(visible('#observatory'), 'B should return to the Observatory, not the title');
+  assert.ok(!visible('#title'), 'the hub is not the title screen');
 
-  assert.ok(visible('#title'), 'B should back out to the title screen');
-  assert.ok(env.focusedButton()?.closest('#title'), 'focus should come back with it');
+  // And BACK again leaves the hub entirely.
+  env.gamepad.buttons[1].pressed = true;
+  env.frames(2);
+  env.gamepad.buttons[1].pressed = false;
+  env.frames(3);
+  assert.ok(visible('#title'), 'B from the hub returns to the title');
   resetInput();
 });

@@ -13,7 +13,7 @@ test('complete campaign meta loop is present',()=>{
   assert.match(game,/RUN_DURATION=480/);
   assert.match(game,/BOSS_TIME=450/);
   assert.match(game,/GOD_WINDOW_START=390/);
-  assert.match(game,/SECTOR COMMANDER DESTROYED/);
+  assert.match(game,/ORBIT COMMANDER DESTROYED/);
 });
 test('core survivor loop and mech genome hooks are present',()=>{
   const source=fs.readFileSync(new URL('game.js',root),'utf8');

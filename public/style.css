@@ -28,3 +28,9 @@
 @media(max-height:700px) and (max-width:760px){#title h1{font-size:56px;margin-bottom:12px}#title>p{margin-bottom:10px}.menu-stack button{min-height:40px;padding:8px 20px}.menu-stack{gap:4px}#touch-stick{width:92px;height:92px}#touch-stick i{left:28px;top:28px;width:36px;height:36px}#touch-dash{width:76px;height:76px}}
 .choice .metrics{display:block;margin:2px 0 6px;font:700 11px Rajdhani;letter-spacing:1.4px;color:var(--cyan);opacity:.92}
 .choice.evolution .metrics{color:#ffe078}
+.observatory-spaces{position:relative;z-index:2;display:grid;grid-template-columns:repeat(2,minmax(240px,320px));gap:12px;margin:18px auto 22px}
+.observatory-spaces .space{display:grid;gap:6px;text-align:left;padding:20px;min-height:110px;align-content:start}
+.observatory-spaces .space-name{font:900 24px 'Barlow Condensed';letter-spacing:3px}
+.observatory-spaces .space-name b{color:var(--gold);font-size:15px;letter-spacing:2px}
+.observatory-spaces .space-desc{font:600 12px Rajdhani;letter-spacing:.6px;color:#a9c2d8;text-transform:none}
+@media(max-width:760px){.observatory-spaces{grid-template-columns:1fr;width:100%;gap:8px}.observatory-spaces .space{min-height:0;padding:13px 15px}}
