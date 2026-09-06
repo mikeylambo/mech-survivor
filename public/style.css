@@ -38,3 +38,12 @@
 .settings-list .volumes label{display:grid;grid-template-columns:78px 1fr 36px;gap:10px;align-items:center;font:700 11px Rajdhani;letter-spacing:2px;color:#a9c2d8}
 .settings-list .volumes b{color:var(--cyan);text-align:right;font-size:12px}
 .settings-list .volumes input[type=range]{width:100%;accent-color:#168fff;background:transparent}
+/* Landscape is a supported fallback, not a failure state: the HUD compresses,
+   the touch controls move inboard, and nothing is cut off. */
+body.landscape #hud{inset:calc(4px + var(--safe-t)) 8px auto;gap:4px 8px}
+body.landscape .systems{width:min(300px,34vw)}
+body.landscape #touch-stick{bottom:max(12px,calc(var(--safe-b) + 8px));width:88px;height:88px}
+body.landscape #touch-stick i{width:34px;height:34px;left:27px;top:27px}
+body.landscape #touch-dash{bottom:max(14px,calc(var(--safe-b) + 10px));width:72px;height:72px}
+body.landscape .screen{justify-content:flex-start;overflow-y:auto}
+body.landscape #commander-card{top:16%}
