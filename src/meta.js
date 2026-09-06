@@ -29,7 +29,40 @@ function endRun(won,summary){bank(summary,won);if(!won)return;window.mechGame.st
 window.MechMeta={bonuses,endRun};
 $('#start').onclick=()=>{renderWorlds();screen('#worlds')};$('#shop-open').onclick=()=>{renderShop();screen('#shop')};$('#class-open').onclick=()=>{renderClasses();screen('#class-screen')};$('#awards-open').onclick=()=>{renderAwards();screen('#awards')};$('#settings-open').onclick=()=>{settingsReturn='title';screen('#settings')};document.querySelectorAll('.back-menu').forEach(b=>b.onclick=mainMenu);$('#pause').onclick=()=>{window.mechGame.pause();screen('#pause-screen')};$('#resume').onclick=()=>{document.querySelectorAll('.screen').forEach(e=>e.classList.add('hidden'));window.mechGame.resume()};$('#restart').onclick=()=>{runBanked=false;window.mechGame.restart()};$('#forfeit').onclick=()=>{const s=window.mechGame.summary();if(s)bank(s,false);mainMenu()};$('#quit-menu').onclick=mainMenu;$('#pause-settings').onclick=()=>{settingsReturn='pause';screen('#settings')};$('.back-context').onclick=()=>screen(settingsReturn==='pause'?'#pause-screen':'#title');$('#retry').onclick=()=>{runBanked=false;window.mechGame.start(selectedWorld)};$('#result-menu').onclick=mainMenu;$('#result-shop').onclick=()=>{renderShop();screen('#shop')};$('#clear-menu').onclick=mainMenu;$('#clear-shop').onclick=()=>{renderShop();screen('#shop')};$('#toggle-vfx').onclick=()=>{save.settings.shake=!save.settings.shake;$('#toggle-vfx b').textContent=save.settings.shake?'ON':'OFF';persist()};$('#toggle-grid').onclick=()=>{save.settings.grid=!save.settings.grid;document.body.classList.toggle('no-grid',!save.settings.grid);$('#toggle-grid b').textContent=save.settings.grid?'ON':'OFF';persist()};$('#reset-save').onclick=()=>{if(confirm('Reset all Mech Survivor progression?')){save=structuredClone(defaults);window.MechRetention?.reset?.();persist();renderShop()}};
 addEventListener('keydown',e=>{if((e.code==='Escape'||e.code==='KeyP')&&window.mechGame?.state==='play')$('#pause').click();else if((e.code==='Escape'||e.code==='KeyP')&&window.mechGame?.state==='paused')$('#resume').click()});
-let padLatch=false,padFocus=0,lastButtons=[];function visibleButtons(){return [...document.querySelectorAll('button:not([disabled])')].filter(b=>b.offsetParent!==null&&!b.classList.contains('hidden'))}function focusButton(index){const buttons=visibleButtons();if(!buttons.length)return;lastButtons.forEach(b=>b.classList.remove('gamepad-focus'));padFocus=(index+buttons.length)%buttons.length;buttons[padFocus].classList.add('gamepad-focus');buttons[padFocus].focus({preventScroll:true});buttons[padFocus].scrollIntoView({block:'nearest'});lastButtons=buttons}
-function gamepadMenus(){const gp=navigator.getGamepads?.()[0];if(gp){const x=gp.axes[0]||0,y=gp.axes[1]||0,left=gp.buttons[14]?.pressed||x<-.55,right=gp.buttons[15]?.pressed||x>.55,up=gp.buttons[12]?.pressed||y<-.55,down=gp.buttons[13]?.pressed||y>.55,a=gp.buttons[0]?.pressed,b=gp.buttons[1]?.pressed,start=gp.buttons[9]?.pressed,active=left||right||up||down||a||b||start;if(active&&!padLatch){if(start){if(window.mechGame?.state==='play')$('#pause').click();else if(window.mechGame?.state==='paused')$('#resume').click()}else if(a){const buttons=visibleButtons();(buttons[padFocus]||buttons[0])?.click()}else if(b){const back=[...document.querySelectorAll('.back-context,.back-menu,#garage-back')].find(e=>e.offsetParent!==null);if(back)back.click();else if(window.mechGame?.state==='paused')$('#resume').click()}else focusButton(padFocus+(left||up?-1:1));padLatch=true}else if(!active)padLatch=false}requestAnimationFrame(gamepadMenus)}
+let padLatch=false,padFocus=0,lastButtons=[],padSignature='';function onScreen(b){return b.offsetParent!==null&&!b.classList.contains('hidden')}
+// When a screen is up it is modal, so it — not the whole document — is what the
+// pad navigates. Without this, index 0 of the document is the HUD pause button,
+// and every re-anchor parked focus there instead of on the screen the player is
+// looking at. Falls back to the whole document if the active screen has no
+// buttons of its own, so a panel that is not a .screen stays reachable.
+function activeScreen(){const open=[...document.querySelectorAll('.screen')].filter(onScreen);return open[open.length-1]||null}
+function visibleButtons(){const screen=activeScreen();if(screen){const scoped=[...screen.querySelectorAll('button:not([disabled])')].filter(onScreen);if(scoped.length)return scoped}return [...document.querySelectorAll('button:not([disabled])')].filter(onScreen)}function buttonSignature(buttons){return buttons.map(b=>b.id||b.textContent||'?').join('|')}// Clear the marker everywhere rather than from the previously focused list: a
+// button can leave that list while a screen changes and keep a stale highlight.
+function clearPadFocus(){for(const b of document.querySelectorAll('button')) b.classList.remove('gamepad-focus')}
+function focusButton(index){const buttons=visibleButtons();if(!buttons.length)return;clearPadFocus();padFocus=(index+buttons.length)%buttons.length;buttons[padFocus].classList.add('gamepad-focus');buttons[padFocus].focus({preventScroll:true});buttons[padFocus].scrollIntoView({block:'nearest'});lastButtons=buttons;padSignature=buttonSignature(buttons)}
+// game.js reveals #levelup and #results itself rather than through screen(), so
+// pad focus used to stay parked on the HUD pause button: A paused the run
+// instead of picking an upgrade, and after dying it did not land on REDEPLOY.
+// Re-anchor to the first button whenever the visible set changes, no matter who
+// changed it, so every screen is reachable without knowing it exists.
+function syncPadFocus(){const buttons=visibleButtons();if(buttonSignature(buttons)===padSignature)return;if(buttons.length)focusButton(0);else{clearPadFocus();padSignature='';lastButtons=[]}}
+function gamepadMenus(){const gp=navigator.getGamepads?.()[0];if(gp){
+ const gameState=window.mechGame?.state,playing=gameState==='play',x=gp.axes[0]||0,y=gp.axes[1]||0,
+  left=gp.buttons[14]?.pressed||x<-.55,right=gp.buttons[15]?.pressed||x>.55,
+  up=gp.buttons[12]?.pressed||y<-.55,down=gp.buttons[13]?.pressed||y>.55,
+  a=gp.buttons[0]?.pressed,b=gp.buttons[1]?.pressed,start=gp.buttons[9]?.pressed,
+  // Mid-run the left stick steers the mech and B is dash. Treating them as menu
+  // input made stick movement yank focus around the HUD and A press the pause
+  // button. During play START is the only menu input the pad has.
+  active=playing?start:(left||right||up||down||a||b||start);
+ if(active&&!padLatch){
+  if(start){if(playing)$('#pause').click();else if(gameState==='paused')$('#resume').click()}
+  else if(a){const buttons=visibleButtons();(buttons[padFocus]||buttons[0])?.click()}
+  else if(b){const back=[...document.querySelectorAll('.back-context,.back-menu,#garage-back')].find(e=>e.offsetParent!==null);if(back)back.click();else if(gameState==='paused')$('#resume').click()}
+  else focusButton(padFocus+(left||up?-1:1));
+  padLatch=true
+ }else if(!active)padLatch=false;
+ if(!playing)syncPadFocus()
+}requestAnimationFrame(gamepadMenus)}
 addEventListener('gamepadconnected',()=>{focusButton(0);const hint=document.createElement('div');hint.className='input-hint';hint.textContent='GAMEPAD · D-PAD/STICK NAVIGATE · A SELECT · B BACK · START PAUSE';document.body.append(hint)});
 $('#class-label').textContent=classes.find(x=>x.id===save.selectedClass)?.name||'ROOK';renderWallets();document.body.classList.toggle('no-grid',!save.settings.grid);gamepadMenus();import('./creatures.js').then(m=>m.initCreatureLab()).catch(err=>console.error('Creature Lab init failed',err));

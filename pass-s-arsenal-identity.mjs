@@ -13,7 +13,9 @@ if(!s.includes('applyBranchDamageModifiers(player,e,d)')){
  s=s.replace(anchor,anchor+'d=applyBranchDamageModifiers(player,e,d);');
 }
 if(!s.includes('tickBranchIdentity(player,dt')){
- const anchor='const m=input();';need(anchor,'movement input seam');
+ // `const m=input();` alone also matches tryDash(), which has no `dt` in scope.
+ // Anchor on the movement seam inside update(dt) so the tick lands in the loop.
+ const anchor='const m=input();player.dashCooldown=Math.max(0,player.dashCooldown-dt);';need(anchor,'movement input seam');
  s=s.replace(anchor,anchor+"tickBranchIdentity(player,dt,{enemies,shots,enemyShots,damageEnemy,elapsed,input:m});");
 }
 need("tickBranchIdentity(player,dt",'branch runtime tick');
