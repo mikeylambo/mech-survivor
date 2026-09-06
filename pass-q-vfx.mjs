@@ -5,7 +5,9 @@ const must=(ok,label)=>{if(!ok)throw new Error('pass-q-vfx: missing '+label)};
 const replace=(from,to,label)=>{if(s.includes(to))return;if(!s.includes(from))throw new Error('pass-q-vfx: missing '+label);s=s.replace(from,to)};
 
 if(!s.includes("from './vfx-engine.js'")){
-  s="import {createVFXEngine} from './vfx-engine.js';\nimport {registerMechVFX} from './mech-vfx.js';\n"+s;
+  s="import {createVFXEngine} from './vfx-engine.js';\nimport {registerMechVFX} from './mech-vfx.js';\nimport {initVFXLab} from './vfx-lab.js';\n"+s;
+}else if(!s.includes("from './vfx-lab.js'")){
+  s=s.replace("import {registerMechVFX} from './mech-vfx.js';","import {registerMechVFX} from './mech-vfx.js';\nimport {initVFXLab} from './vfx-lab.js';");
 }
 
 const paletteLine="const palette={white:'#eaf7ff',navy:'#071323',blue:'#168fff',cyan:'#78e7ff',gold:'#d6ae52',red:'#ff4664'};";
@@ -77,5 +79,9 @@ if(!s.includes('fx.clear();const maxHp=')){
   replace('shake=flash=0;const maxHp=','shake=flash=0;fx.clear();const maxHp=','VFX reset');
 }
 
+if(!s.includes('initVFXLab(fx')){
+  s=s.replace('initCreatureLab();',"initCreatureLab();\ninitVFXLab(fx,()=>player||{x:0,y:0});");
+}
+
 fs.writeFileSync(path,s);
-console.log('pass-q-vfx: SLU VFX v0.1 + Mech recipe pack integrated');
+console.log('pass-q-vfx: SLU VFX v0.2 + in-game lab integrated');
