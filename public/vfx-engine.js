@@ -65,7 +65,7 @@ export function createVFXEngine(options={}){
     ctx.restore();ctx.globalAlpha=1;
   }
   function clear(){active.length=0;scheduled.length=0}
-  const api={define,has,play,update,draw,clear,get activeCount(){return active.length},get recipeCount(){return recipes.size}};
+  const api={define,has,play,update,draw,clear,get activeCount(){return active.length},get recipeCount(){return recipes.size},get recipeIds(){return [...recipes.keys()]}};
   return api;
 }
 
