@@ -1,7 +1,7 @@
 import {ARSENAL_BY_ID,familyPower} from './arsenal.js';
-import {mv} from './arsenal-metrics.js';
+import {mv,mvFor} from './arsenal-metrics.js';
 // Cooldowns are read before profile() runs, so they go through the raw state.
-const M=(id,key,p)=>mv(id,key,state(p,id));
+const M=(id,key,p)=>mvFor(p,id,key,state(p,id));
 const TAU=Math.PI*2;
 const rt=(p,id)=>p._arsenalRt||(p._arsenalRt={}), key=>{};
 const state=(p,id)=>p.arsenal?.[id]||{tier:0,branch:null,evo:0};
@@ -16,7 +16,11 @@ function profile(p,id){const s=state(p,id),f=ARSENAL_BY_ID[id],power=Math.max(1,
 // `controlResist` is a generic per-enemy dial, not a boss import: a sector
 // commander sets its own from its doctrine, and everything else leaves it
 // undefined and gets pushed in full. It is capped so control always works.
-export function tickArsenal(p,dt,c){const {enemies,shots,enemyShots,damageEnemy,elapsed}=c;const cfg=p.configurations||new Set();
+export function tickArsenal(p,dt,c){
+ // Shadow the bare read with the player-aware one: every mv() below now
+ // carries this frame's Alignment modifiers without 30 separate edits.
+ const mv=(id,key,st)=>mvFor(p,id,key,st);
+const {enemies,shots,enemyShots,damageEnemy,elapsed}=c;const cfg=p.configurations||new Set();
  const has=id=>(state(p,id).tier||0)>0;
  // Kinetic families
  if(has('rail')&&ready(p,'rail',dt,M('rail','cooldown',p))){const q=profile(p,'rail'),e=nearest(enemies,p.x,p.y);if(e){const a=Math.atan2(e.y-p.y,e.x-p.x),n=mv('rail','shots',q.s);for(let i=0;i<n;i++)shot(shots,p.x,p.y,a+(i-(n-1)/2)*.07,900,mv('rail','damage',q.s),'rail',{pierce:mv('rail','pierce',q.s)+(cfg.has('gravity-spear')?2:0),r:q.branch==='a'?5:3});fx(p,'line',{x:p.x,y:p.y,a,len:220,life:.12})}}

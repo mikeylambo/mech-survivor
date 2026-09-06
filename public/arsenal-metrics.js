@@ -11,7 +11,7 @@
 // damage. The progression test checks tier-over-tier against the declared
 // direction rather than a blind N+1 >= N, which would force every number
 // upward and quietly forbid honest trade-offs.
-import {familyPower} from './arsenal.js';
+import {familyPower, ARSENAL_BY_ID} from './arsenal.js';
 
 export const DIRECTION = {
   UP: 'increase',
@@ -214,6 +214,36 @@ export const FAMILY_METRICS = {
   ],
 };
 
+/**
+ * Alignment modifiers, applied on top of a base formula.
+ *
+ * This is the single choke point that makes a family-specific Alignment real:
+ * because arsenal-runtime.js reads every magnitude through here, granting
+ * `mods.family.rail.damage = 1.18` changes what the Rail Cannon actually does
+ * AND what its card says, with no per-family wiring.
+ *
+ * Multipliers compose; `+` entries are flat adders applied after.
+ */
+export function applyMods(player, familyId, key, value) {
+  const mods = player?.mods;
+  if (!mods) return value;
+  const category = ARSENAL_BY_ID?.[familyId]?.category;
+  let out = value;
+  for (const scope of [mods.all, category && mods.category?.[category], mods.family?.[familyId]]) {
+    if (!scope) continue;
+    const mul = scope[key];
+    if (typeof mul === 'number') out *= mul;
+    const add = scope[`+${key}`];
+    if (typeof add === 'number') out += add;
+  }
+  return out;
+}
+
+/** Player-aware metric read. The runtime and the cards both go through this. */
+export function mvFor(player, familyId, key, state) {
+  return applyMods(player, familyId, key, mv(familyId, key, state));
+}
+
 /** Read one metric's live value. This is what the runtime calls. */
 export function mv(familyId, key, state) {
   const metric = (FAMILY_METRICS[familyId] || []).find((m) => m.key === key);
@@ -230,11 +260,11 @@ export function formatMetric(metric, value) {
  * Every metric a family exposes, resolved at `state`.
  * `previous` (optional) adds the delta a card is offering.
  */
-export function metricsFor(familyId, state, previous = null) {
+export function metricsFor(familyId, state, previous = null, player = null) {
   const metrics = FAMILY_METRICS[familyId] || [];
   return metrics.map((m) => {
-    const value = m.value(state);
-    const before = previous ? m.value(previous) : null;
+    const value = applyMods(player, familyId, m.key, m.value(state));
+    const before = previous ? applyMods(player, familyId, m.key, m.value(previous)) : null;
     return {
       key: m.key,
       label: m.label,
@@ -260,8 +290,8 @@ export function metricLine(list) {
  * A pick that moves no declared scalar is behaviour-only and says so rather
  * than inventing a number to satisfy a test.
  */
-export function cardMetrics(familyId, current, next) {
-  const list = metricsFor(familyId, next, current);
+export function cardMetrics(familyId, current, next, player = null) {
+  const list = metricsFor(familyId, next, current, player);
   const changed = list.filter((m) => m.delta !== null && Math.abs(m.delta) > 1e-9);
   const behaviorOnly = changed.length === 0;
   return {

@@ -29,4 +29,5 @@ export const PASSES = [
   'pass-x-mobile.mjs',
   'pass-y-orbit.mjs',
   'pass-z-radar.mjs',
+  'pass-aa-alignments.mjs',
 ];
